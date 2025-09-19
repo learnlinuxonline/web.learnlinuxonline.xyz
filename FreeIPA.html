@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreeIPA on Ubuntu 20.04 - LearnLinuxOnline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --text: #334155;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+        }
+        
+        header {
+            background: var(--light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a.active {
+            color: var(--primary);
+        }
+        
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .breadcrumb {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .project-content {
+            max-width: 1200px;
+            margin: 1rem auto 2rem;
+            padding: 0 1.5rem;
+        }
+        
+        .project-details {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .project-details h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .project-details p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .prerequisites {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .prerequisites h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .prerequisites ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+        
+        .prerequisites li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .step-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-section h3 .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        
+        pre {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            border: 1px solid var(--medium-gray);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        code {
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .note {
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .note strong {
+            color: var(--accent);
+        }
+        
+        .warning {
+            background: #fef2f2;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .warning strong {
+            color: #ef4444;
+        }
+        
+        .info {
+            background: #eff6ff;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info strong {
+            color: var(--primary);
+        }
+        
+        footer {
+            background: var(--light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            nav {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .project-content {
+                padding: 0 1rem;
+            }
+            
+            .project-details {
+                padding: 1.2rem;
+            }
+            
+            .project-details h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .command {
+            position: relative;
+        }
+        
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .command-copy:hover {
+            background: var(--primary);
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .tutorial-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .tutorial-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tutorial-nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .config-table th, .config-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .config-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        .config-table tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LearnLinuxOnline</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="courses.html">Courses</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &raquo; FreeIPA on Ubuntu 20.04
+    </div>
+
+    <div class="project-content">
+        <main class="project-details">
+            <h2>Centralized Authentication with FreeIPA on Ubuntu 20.04 LTS</h2>
+            <p>FreeIPA is an integrated Identity and Authentication solution for Linux/UNIX environments that provides centralized authentication, authorization, and account information. This tutorial will guide you through setting up FreeIPA on Ubuntu 20.04 LTS.</p>
+            
+            <div class="prerequisites">
+                <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+                <ul>
+                    <li>Ubuntu 20.04 LTS server</li>
+                    <li>Minimum 4GB RAM (8GB recommended for production)</li>
+                    <li>20GB+ of disk space</li>
+                    <li>Root or sudo privileges</li>
+                    <li>Static IP address configured</li>
+                    <li>Fully Qualified Domain Name (FQDN) for the server</li>
+                    <li>DNS server properly configured with forward and reverse records</li>
+                </ul>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">1</span> System Preparation</h3>
+                <p>Update your system and set the hostname:</p>
+                <div class="command">
+                    <pre><code>sudo apt update && sudo apt upgrade -y
+sudo hostnamectl set-hostname ipa.example.com
+exec bash</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Edit the hosts file to include the FQDN:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/hosts</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add an entry for your server (replace with your actual IP and domain):</p>
+                <div class="command">
+                    <pre><code>192.168.1.100 ipa.example.com ipa</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the hostname and FQDN:</p>
+                <div class="command">
+                    <pre><code>hostname
+hostname -f</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">2</span> Configure DNS</h3>
+                <p>FreeIPA requires properly configured DNS. You can use the integrated DNS or an external DNS server.</p>
+                <p>If using an external DNS server, ensure these records exist:</p>
+                <div class="command">
+                    <pre><code>ipa.example.com.    IN A    192.168.1.100
+_ldap._tcp.example.com. IN SRV 0 100 389 ipa.example.com.
+_kerberos._tcp.example.com. IN SRV 0 100 88 ipa.example.com.
+_kerberos._udp.example.com. IN SRV 0 100 88 ipa.example.com.
+_kpasswd._tcp.example.com. IN SRV 0 100 464 ipa.example.com.
+_kpasswd._udp.example.com. IN SRV 0 100 464 ipa.example.com.</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify DNS resolution:</p>
+                <div class="command">
+                    <pre><code>dig ipa.example.com
+dig -t SRV _ldap._tcp.example.com</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">3</span> Install FreeIPA Server</h3>
+                <p>Install the FreeIPA server packages:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y freeipa-server freeipa-server-dns</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Run the FreeIPA installation wizard:</p>
+                <div class="command">
+                    <pre><code>sudo ipa-server-install</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>The installer will prompt for several configuration options. Here's a typical setup:</p>
+                <div class="command">
+                    <pre><code>Do you want to configure integrated DNS (BIND)? [no]: yes
+Server host name [ipa.example.com]: 
+Please confirm the domain name [example.com]: 
+Please provide a realm name [EXAMPLE.COM]: 
+Directory Manager password: 
+Password (confirm): 
+IPA admin password: 
+Password (confirm): 
+Do you want to configure DNS forwarders? [yes]: 
+Do you want to configure these servers as DNS forwarders? [yes]: 
+Enter DNS forwarder IP address: 8.8.8.8
+Do you want to search for missing reverse zones? [yes]: 
+Continue to configure the system with these values? [no]: yes</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <div class="note">
+                    <strong>Note:</strong> The installation process may take 10-20 minutes to complete.
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">4</span> Configure Firewall</h3>
+                <p>Allow necessary ports through the firewall:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow 80/tcp    # HTTP
+sudo ufw allow 443/tcp   # HTTPS
+sudo ufw allow 389/tcp   # LDAP
+sudo ufw allow 636/tcp   # LDAPS
+sudo ufw allow 88/tcp    # Kerberos
+sudo ufw allow 464/tcp   # kpasswd
+sudo ufw allow 53/tcp    # DNS
+sudo ufw allow 53/udp    # DNS
+sudo ufw allow 123/udp   # NTP
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the firewall status:</p>
+                <div class="command">
+                    <pre><code>sudo ufw status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">5</span> Verify Installation</h3>
+                <p>Check if FreeIPA services are running:</p>
+                <div class="command">
+                    <pre><code>sudo ipactl status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test Kerberos authentication:</p>
+                <div class="command">
+                    <pre><code>kinit admin
+klist</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test LDAP connectivity:</p>
+                <div class="command">
+                    <pre><code>ldapsearch -x -b dc=example,dc=com -H ldap://ipa.example.com</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">6</span> Access Web Interface</h3>
+                <p>Open your web browser and navigate to:</p>
+                <div class="command">
+                    <pre><code>https://ipa.example.com</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Log in with the username <code>admin</code> and the password you set during installation.</p>
+                <p>You should see the FreeIPA web interface dashboard.</p>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">7</span> Configure FreeIPA Client on Ubuntu</h3>
+                <p>On client machines, install the FreeIPA client packages:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y freeipa-client</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Join the client to the FreeIPA domain:</p>
+                <div class="command">
+                    <pre><code>sudo ipa-client-install --domain=example.com --server=ipa.example.com --mkhomedir</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Alternatively, use the interactive setup:</p>
+                <div class="command">
+                    <pre><code>sudo ipa-client-install</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>You'll be prompted for:</p>
+                <div class="command">
+                    <pre><code>Domain name: example.com
+IPA server: ipa.example.com
+Directory Manager password: 
+Continue to configure the system with these values? [no]: yes
+User authorized to enroll computers: admin
+Password for admin@EXAMPLE.COM:</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">8</span> Create Users and Groups</h3>
+                <p>Using the FreeIPA web interface:</p>
+                <ol>
+                    <li>Go to "Identity" → "Users"</li>
+                    <li>Click "Add" to create a new user</li>
+                    <li>Fill in the user details (first name, last name, username)</li>
+                    <li>Set a temporary password or check "Random" to generate one</li>
+                    <li>Click "Add" to create the user</li>
+                </ol>
+                <p>Using the command line:</p>
+                <div class="command">
+                    <pre><code>ipa user-add johndoe --first=John --last=Doe --email=johndoe@example.com --password
+ipa group-add developers --desc="Development Team"
+ipa group-add-member developers --users=johndoe</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">9</span> Configure Automatic Home Directory Creation</h3>
+                <p>Ensure PAM is configured to create home directories on login:</p>
+                <div class="command">
+                    <pre><code>sudo pam-auth-update --enable mkhomedir
+sudo systemctl restart sssd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Alternatively, edit the PAM configuration manually:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/pam.d/common-session</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add this line to the file:</p>
+                <div class="command">
+                    <pre><code>session required pam_mkhomedir.so skel=/etc/skel umask=0022</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">10</span> Test Authentication</h3>
+                <p>Test user authentication from a client machine:</p>
+                <div class="command">
+                    <pre><code>ssh johndoe@client.example.com</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test Kerberos ticket acquisition:</p>
+                <div class="command">
+                    <pre><code>kinit johndoe
+klist</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify user information:</p>
+                <div class="command">
+                    <pre><code>id johndoe
+getent passwd johndoe
+getent group developers</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">11</span> Configure SSH for Kerberos Authentication</h3>
+                <p>Edit the SSH server configuration on clients:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/ssh/sshd_config</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Ensure these options are set:</p>
+                <div class="command">
+                    <pre><code>GSSAPIAuthentication yes
+GSSAPICleanupCredentials yes
+UsePAM yes</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Restart the SSH service:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart sshd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">12</span> Troubleshooting Common Issues</h3>
+                <p>Check FreeIPA service status:</p>
+                <div class="command">
+                    <pre><code>sudo ipactl status
+journalctl -u dirsrv@EXAMPLE-COM.service -f</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check SSSD authentication issues:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status sssd
+journalctl -u sssd -f
+sssctl user-checks johndoe
+sssctl domain-status example.com</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check Kerberos issues:</p>
+                <div class="command">
+                    <pre><code>kinit -V johndoe
+klist -e
+ipa krbtpolicy-show</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common issues and solutions:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Cannot acquire Kerberos ticket</td>
+                        <td>Check time synchronization (NTP) and DNS resolution</td>
+                    </tr>
+                    <tr>
+                        <td>User not found</td>
+                        <td>Check SSSD configuration and domain status</td>
+                    </tr>
+                    <tr>
+                        <td>Home directory not created</td>
+                        <td>Verify PAM mkhomedir configuration</td>
+                    </tr>
+                    <tr>
+                        <td>SSH authentication fails</td>
+                        <td>Check GSSAPI settings in sshd_config</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tutorial-nav">
+                <a href="bacula-backup.html"><i class="fas fa-arrow-left"></i> Previous: Bacula Backup</a>
+                <a href="samba-server.html">Next: Samba File Server <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <div class="success-message" id="copy-success">
+        <i class="fas fa-check-circle"></i> Command copied to clipboard!
+    </div>
+
+    <footer>
+        <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.command-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.previousElementSibling.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const successMsg = document.getElementById('copy-success');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

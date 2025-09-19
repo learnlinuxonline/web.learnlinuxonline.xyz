@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light-gray); color: var(--text); margin: 0; }
+    header { background: var(--light); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .logo { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+    nav { display: flex; gap: 1.5rem; }
+    nav a { color: var(--text); text-decoration: none; font-weight: 500; position: relative; }
+    nav a.active { color: var(--primary); }
+    nav a.active::after { content: ''; position: absolute; bottom: -5px; left: 0; right: 0; height: 3px; background: var(--primary); border-radius: 3px; }
+    .contact-container { max-width: 1200px; margin: 2rem auto; padding: 2rem; background: var(--light); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    h1 { color: var(--primary); margin-bottom: 1.5rem; }
+    .info { margin-bottom: 2rem; }
+    .info p { margin: 0.5rem 0; }
+    .info strong { color: var(--text-dark); }
+    .qr-section { display: flex; gap: 2rem; flex-wrap: wrap; margin-top: 2rem; }
+    .qr-card { flex: 1; min-width: 280px; background: var(--light-gray); border-radius: 12px; padding: 1rem; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .qr-card img { width: 200px; height: auto; border-radius: 12px; }
+    footer { background: var(--light); text-align: center; padding: 1.5rem; margin-top: 3rem; border-top: 1px solid var(--medium-gray); color: var(--dark-gray); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+  </header>
+
+  <div class="contact-container">
+    <h1>Contact Information</h1>
+    <div class="info">
+      <p><strong>Name:</strong> Mohammad Ali</p>
+      <p><strong>Phone:</strong> 01744906268</p>
+      <p><strong>Email:</strong> mohammad@learnlinuxonline.xyz</p>
+      <p><strong>Address:</strong> S S Road, Sirajganj Sadar, Sirajganj</p>
+    </div>
+
+    <h2>Join Our Groups</h2>
+    <div class="qr-section">
+      <div class="qr-card">
+        <h3>Telegram Group</h3>
+        <img src="telegram.jpg" alt="Telegram QR Code">
+      </div>
+      <div class="qr-card">
+        <h3>WhatsApp Group</h3>
+        <img src="whatsapp.jpeg" alt="WhatsApp QR Code">
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+</body>
+</html>

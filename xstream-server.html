@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>XStream Server (Legal Alternatives) - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --primary:#2563eb; --primary-light:#3b82f6; --secondary:#059669; --light:#ffffff;
+      --light-gray:#f8fafc; --medium-gray:#e2e8f0; --dark-gray:#64748b; --text:#334155;
+      --text-dark:#1e293b; --border:#cbd5e1; --accent:#f59e0b; --success:#10b981; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;line-height:1.6;color:var(--text);background:var(--light-gray);}
+    header{background:var(--light);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:100;}
+    .logo{font-size:1.8rem;font-weight:700;color:var(--primary);}
+    nav{display:flex;gap:1.5rem;}
+    nav a{color:var(--text);text-decoration:none;font-weight:500;padding:.5rem 0;position:relative;transition:color .3s;}
+    nav a:hover{color:var(--primary);} nav a.active{color:var(--primary);}
+    nav a.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary);border-radius:3px;}
+    .breadcrumb{max-width:1200px;margin:1rem auto 0;padding:0 1.5rem;font-size:.9rem;color:var(--dark-gray);}
+    .breadcrumb a{color:var(--primary);text-decoration:none;} .breadcrumb a:hover{text-decoration:underline;}
+    .project-content{max-width:1200px;margin:1rem auto 2rem;padding:0 1.5rem;display:grid;grid-template-columns:1fr 3fr;gap:2rem;}
+    .project-nav{background:var(--light);padding:1.5rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.05);height:fit-content;position:sticky;top:90px;}
+    .project-nav h3{color:var(--primary);margin-top:0;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:2px solid var(--medium-gray);font-size:1.3rem;}
+    .project-nav ul{list-style:none;}
+    .project-nav li{margin:.8rem 0;}
+    .project-nav a{color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.7rem;padding:.7rem;border-radius:8px;transition:all .3s;font-weight:500;}
+    .project-nav a:hover{background:var(--primary-light);color:#fff;} .project-nav a.active{background:var(--primary);color:#fff;}
+    .project-details{background:var(--light);padding:2rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.05);}
+    .project-details h2{color:var(--primary);margin-bottom:1.5rem;font-size:1.8rem;}
+    .project-details p{margin-bottom:1.5rem;line-height:1.7;}
+    .prerequisites{background:var(--light-gray);padding:1.5rem;border-radius:10px;margin-bottom:2rem;border-left:4px solid var(--accent);}
+    .prerequisites h3{color:var(--primary);margin-top:0;margin-bottom:1rem;font-size:1.3rem;}
+    .prerequisites ul{padding-left:1.5rem;margin-bottom:0;} .prerequisites li{margin-bottom:.5rem;}
+    .step-section{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--medium-gray);}
+    .step-section h3{color:var(--primary);margin-bottom:1rem;font-size:1.3rem;display:flex;align-items:center;gap:.5rem;}
+    .step-number{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--primary);color:#fff;border-radius:50%;font-size:.9rem;margin-right:.5rem;}
+    pre{background:var(--light-gray);padding:1.2rem;border-radius:8px;overflow-x:auto;margin:1.2rem 0;border:1px solid var(--medium-gray);font-family:'Consolas','Monaco',monospace;font-size:.95rem;line-height:1.5;}
+    code{color:var(--secondary);font-family:'Consolas','Monaco',monospace;font-size:.95rem;}
+    .note{background:#fffbeb;padding:1.2rem;border-radius:8px;margin:1.2rem 0;border-left:4px solid var(--accent);} .note strong{color:var(--accent);}
+    footer{background:var(--light);text-align:center;padding:1.5rem;margin-top:3rem;border-top:1px solid var(--medium-gray);color:var(--dark-gray);}
+    .command{position:relative;} .command-copy{position:absolute;top:.5rem;right:.5rem;background:var(--primary-light);color:#fff;border:none;padding:.3rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem;transition:background .3s;}
+    .command-copy:hover{background:var(--primary);} .success-message{position:fixed;bottom:20px;right:20px;background:var(--success);color:#fff;padding:.8rem 1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.1);display:none;z-index:1000;}
+    .tutorial-nav{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1rem;border-top:1px solid var(--medium-gray);}
+    .tutorial-nav a{color:var(--primary);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:.5rem;}
+    .tutorial-nav a:hover{text-decoration:underline;}
+    .tabs{display:flex;margin-bottom:1.5rem;border-bottom:1px solid var(--medium-gray);}
+    .tab{padding:.8rem 1.5rem;cursor:pointer;font-weight:500;border-bottom:3px solid transparent;transition:all .3s;}
+    .tab.active{color:var(--primary);border-bottom:3px solid var(--primary);}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+    @media (max-width:900px){.project-content{grid-template-columns:1fr;} .project-nav{position:static;margin-bottom:1.5rem;} header{flex-direction:column;text-align:center;padding:1rem;} nav{margin-top:1rem;flex-wrap:wrap;justify-content:center;gap:1rem;}}
+    @media (max-width:600px){.project-content{padding:0 1rem;} .project-details,.project-nav{padding:1.2rem;} .project-details h2{font-size:1.5rem;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; XStream Server (Legal Alternatives)
+  </div>
+
+  <div class="project-content">
+    <!-- Sidebar -->
+    <aside class="project-nav">
+      <h3>Server Projects</h3>
+      <ul>
+        <li><a href="dns-server.html"><i class="fas fa-network-wired"></i> DNS Server on Ubuntu</a></li>
+        <li><a href="web-server.html"><i class="fas fa-server"></i> Web Server</a></li>
+        <li><a href="cacti-monitoring.html"><i class="fas fa-chart-line"></i> Cacti Monitoring</a></li>
+        <li><a href="lancache-server.html"><i class="fas fa-database"></i> Lancache Server</a></li>
+        <li><a href="issabel-pbx.html"><i class="fas fa-phone-alt"></i> Issabel PBX</a></li>
+        <li><a href="tv-server-flussonic.html"><i class="fas fa-tv"></i> TV Server with Flussonic</a></li>
+        <li><a href="xstream-server.html" class="active"><i class="fas fa-stream"></i> XStream Server</a></li>
+        <li><a href="virtualmin-roundcube.html"><i class="fas fa-envelope"></i> Virtualmin + Roundcube</a></li>
+        <li><a href="radarr-sonarr-bazarr.html"><i class="fas fa-film"></i> Radarr, Sonarr, Bazarr</a></li>
+        <li><a href="prowlarr.html"><i class="fas fa-search"></i> Prowlarr</a></li>
+        <li><a href="proxmox-ve.html"><i class="fas fa-cloud"></i> Proxmox VE</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="project-details">
+      <h2>XStream Server (Legal Alternatives)</h2>
+      <div class="note"><strong>Why no Xtream UI?</strong> Xtream UI প্রায়ই কপিরাইটেড IPTV/চ্যানেল অবৈধভাবে রিব্রডকাস্টে ব্যবহৃত হয়। তাই এই গাইডে আমরা তা কভার করবো না। পরিবর্তে আপনি যাতে <strong>আইনি সোর্স</strong> দিয়ে প্রোডাকশন গ্রেড স্ট্রিমিং চালাতে পারেন তার জন্য <strong>OvenMediaEngine (OME)</strong> এবং <strong>SRS</strong>-এর স্টেপ-বাই-স্টেপ সেটআপ দেখানো হলো।</div>
+
+      <div class="prerequisites">
+        <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+        <ul>
+          <li>Ubuntu 22.04/24.04 Server (Static IP)</li>
+          <li>Inbound ফিডের আইনি অধিকার (camera/encoder, licensed channel feed)</li>
+          <li>TCP/UDP: 1935 (RTMP), 3333/3478/10000-30000 (WebRTC), 80/443 (HLS/DASH)</li>
+          <li>FFmpeg (transcode/push এর জন্য)</li>
+        </ul>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="ome">OvenMediaEngine</div>
+        <div class="tab" data-tab="srs">SRS (Simple Realtime Server)</div>
+        <div class="tab" data-tab="secure">Secure Access (Auth/Token)</div>
+      </div>
+
+      <!-- OME -->
+      <section id="ome-content" class="tab-content active">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Install OvenMediaEngine (APT)</h3>
+          <div class="command">
+            <pre><code>sudo apt update
+sudo apt install -y curl gnupg ca-certificates
+curl -fsSL https://apt.ovenmediaengine.com/ovenmediaengine.gpg | sudo gpg --dearmor -o /usr/share/keyrings/ome.gpg
+echo "deb [signed-by=/usr/share/keyrings/ome.gpg] https://apt.ovenmediaengine.com/ $(. /etc/os-release; echo $VERSION_CODENAME) main" | \
+sudo tee /etc/apt/sources.list.d/ovenmediaengine.list
+sudo apt update
+sudo apt install -y ovenmediaengine</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">2</span> Basic Config (LiveApp)</h3>
+          <p>ডিফল্ট অ্যাপ <code>LiveApp</code> সক্রিয়—RTMP ingest, LL-HLS/WebRTC output। কনফিগ ফাইল: <code>/opt/ovenmediaengine/conf/Server.xml</code> এবং <code>/opt/ovenmediaengine/conf/Origin.xml</code>.</p>
+          <div class="command">
+            <pre><code>sudo systemctl enable --now ovenmediaengine
+sudo systemctl status ovenmediaengine
+# RTMP Ingest: rtmp://&lt;server-ip&gt;/app/stream
+# Player (LL-HLS): http://&lt;server-ip&gt;/app/streams/stream/llhls.m3u8
+# Player (WebRTC): https://&lt;server-ip&gt;:8443/app/stream (built-in player)</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">3</span> Ingest via FFmpeg/OBS</h3>
+          <div class="command">
+            <pre><code># Example: file/camera to RTMP
+ffmpeg -re -i input.mp4 -c:v libx264 -preset veryfast -b:v 3000k -c:a aac -b:a 128k \
+-f flv rtmp://&lt;server-ip&gt;/app/stream</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">4</span> Transcoding (ABR) – Simple Map</h3>
+          <p><code>/opt/ovenmediaengine/conf/Transcoder.xml</code> এ প্রিসেট যোগ করে 1080p/720p/480p ladder বানান।</p>
+          <div class="command">
+            <pre><code>sudo nano /opt/ovenmediaengine/conf/Transcoder.xml
+sudo systemctl restart ovenmediaengine</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>Tip:</strong> CPU কম হলে 720p/480p রাখুন; GPU থাকলে NVENC/VAAPI ব্যবহার করুন।</div>
+        </div>
+      </section>
+
+      <!-- SRS -->
+      <section id="srs-content" class="tab-content">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Install SRS (Docker)</h3>
+          <div class="command">
+            <pre><code>sudo apt update &amp;&amp; sudo apt install -y docker.io docker-compose-plugin
+mkdir -p ~/srs &amp;&amp; cd ~/srs
+cat &gt; docker-compose.yml &lt;&lt;'YAML'
+services:
+  srs:
+    image: ossrs/srs:5
+    ports:
+      - "1935:1935"     # RTMP
+      - "8080:8080"     # API/Players
+      - "1985:1985"     # HTTP-API
+    command: ["./objs/srs", "-c", "conf/docker.conf"]
+    restart: unless-stopped
+YAML
+docker compose up -d</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">2</span> RTMP Ingest & HLS Output</h3>
+          <div class="command">
+            <pre><code># push a stream
+ffmpeg -re -i input.mp4 -c:v libx264 -preset veryfast -c:a aac -f flv \
+rtmp://&lt;server-ip&gt;/live/stream
+
+# Play HLS:
+http://&lt;server-ip&gt;:8080/live/stream.m3u8</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>Note:</strong> SRS ডিফল্ট কনফিগে live app থাকে—প্রয়োজনে <code>conf/docker.conf</code> কাস্টমাইজ করুন।</div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">3</span> Nginx Reverse Proxy (HTTPS)</h3>
+          <div class="command">
+            <pre><code>sudo apt install -y nginx certbot python3-certbot-nginx
+sudo tee /etc/nginx/sites-available/stream.conf &gt;/dev/null &lt;&lt;'NGX'
+server {
+  listen 80;
+  server_name yourdomain.com;
+  location / {
+    proxy_pass http://127.0.0.1:8080;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+NGX
+sudo ln -s /etc/nginx/sites-available/stream.conf /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx
+sudo certbot --nginx -d yourdomain.com</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Secure -->
+      <section id="secure-content" class="tab-content">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Basic Auth (Protect Players/Manifests)</h3>
+          <div class="command">
+            <pre><code>sudo apt install -y apache2-utils
+sudo htpasswd -c /etc/nginx/.stream_users admin
+# password prompt দেবে
+sudo tee /etc/nginx/snippets/stream_basic_auth.conf &gt;/dev/null &lt;&lt;'SNIP'
+auth_basic "Restricted";
+auth_basic_user_file /etc/nginx/.stream_users;
+SNIP</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="command">
+            <pre><code># Nginx vhost এ প্রটেক্টেড লোকেশন:
+location /live/ {
+  proxy_pass http://127.0.0.1:8080/live/;
+  include /etc/nginx/snippets/stream_basic_auth.conf;
+}</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">2</span> Tokenized URLs (Nginx Secure Link)</h3>
+          <p>Time-limited token দিয়ে HLS প্লেলিস্ট সুরক্ষিত করা যায়।</p>
+          <div class="command">
+            <pre><code># /etc/nginx/nginx.conf এ http{} ব্লকে:
+load_module modules/ngx_http_secure_link_module.so;
+
+# server{} তে:
+secure_link_secret supersecretkey;
+location ~* /live/([a-zA-Z0-9_-]+)/index.m3u8$ {
+  set $token $arg_st;
+  set $exp   $arg_ex;
+  secure_link "$exp$uri$remote_addr";
+  secure_link_md5 "$exp$uri supersecretkey";
+  if ($secure_link = "") { return 403; }
+  if ($secure_link = "0") { return 410; }
+  proxy_pass http://127.0.0.1:8080;
+}</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>How to use:</strong> আপনার অ্যাপ থেকে <code>ex</code> (expiry epoch) ও <code>st</code> (md5 token) জেনারেট করে URL এ যোগ করুন।</div>
+        </div>
+      </section>
+
+      <div class="tutorial-nav">
+        <a href="tv-server-flussonic.html"><i class="fas fa-arrow-left"></i> Previous: TV Server with Flussoni

@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redis Server Installation - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Improved Light Color Scheme and Typography */
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+      --border: #cbd5e1;
+      --accent: #f59e0b;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--light-gray);
+    }
+    
+    /* Header Styles */
+    header {
+      background: var(--light);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s;
+    }
+    
+    nav a:hover {
+      color: var(--primary);
+    }
+    
+    nav a.active {
+      color: var(--primary);
+    }
+    
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 1200px;
+      margin: 1rem auto 0;
+      padding: 0 1.5rem;
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+    }
+    
+    .breadcrumb a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Main Content Layout */
+    .project-content {
+      max-width: 1200px;
+      margin: 1rem auto 2rem;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 2rem;
+    }
+    
+    /* Sidebar Navigation */
+    .project-nav {
+      background: var(--light);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      height: fit-content;
+      position: sticky;
+      top: 90px;
+    }
+    
+    .project-nav h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid var(--medium-gray);
+      font-size: 1.3rem;
+    }
+    
+    .project-nav ul {
+      list-style: none;
+    }
+    
+    .project-nav li {
+      margin: 0.8rem 0;
+    }
+    
+    .project-nav a {
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .project-nav a:hover {
+      background: var(--primary-light);
+      color: white;
+    }
+    
+    .project-nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Main Content Area */
+    .project-details {
+      background: var(--light);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .project-details h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+    
+    .project-details p {
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+    
+    /* Section Styles */
+    .prerequisites {
+      background: var(--light-gray);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .prerequisites h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    
+    .prerequisites ul {
+      padding-left: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    .prerequisites li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .step-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .step-section h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .step-section h3 .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+    
+    /* Code Blocks */
+    pre {
+      background: var(--light-gray);
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      border: 1px solid var(--medium-gray);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    code {
+      color: var(--secondary);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+    }
+    
+    /* Note Box */
+    .note {
+      background: #fffbeb;
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .note strong {
+      color: var(--accent);
+    }
+    
+    /* Footer */
+    footer {
+      background: var(--light);
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 3rem;
+      border-top: 1px solid var(--medium-gray);
+      color: var(--dark-gray);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .project-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .project-nav {
+        position: static;
+        margin-bottom: 1.5rem;
+      }
+      
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+      }
+      
+      nav {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .project-content {
+        padding: 0 1rem;
+      }
+      
+      .project-details, .project-nav {
+        padding: 1.2rem;
+      }
+      
+      .project-details h2 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Additional Styling */
+    .command {
+      position: relative;
+    }
+    
+    .command-copy {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--primary-light);
+      color: white;
+      border: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.3s;
+    }
+    
+    .command-copy:hover {
+      background: var(--primary);
+    }
+    
+    .success-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 1000;
+    }
+    
+    /* Tutorial navigation */
+    .tutorial-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--medium-gray);
+    }
+    
+    .tutorial-nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tutorial-nav a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Tabs for Ubuntu/RedHat */
+    .tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .tab {
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; Redis Server Installation
+  </div>
+
+  <div class="project-content">
+    <aside class="project-nav">
+      <h3>Server Projects</h3>
+      <ul>
+        <li><a href="dns-server.html"><i class="fas fa-network-wired"></i> DNS Server on Ubuntu</a></li>
+        <li><a href="web-server.html"><i class="fas fa-server"></i> Web Server</a></li>
+        <li><a href="mysql-server.html"><i class="fas fa-database"></i> MySQL/MariaDB Server</a></li>
+        <li><a href="postgresql-server.html"><i class="fas fa-database"></i> PostgreSQL Server</a></li>
+        <li><a href="mongodb-server.html"><i class="fas fa-database"></i> MongoDB Server</a></li>
+        <li><a href="redis-server.html" class="active"><i class="fas fa-database"></i> Redis Server</a></li>
+        <li><a href="cacti-monitoring.html"><i class="fas fa-chart-line"></i> Cacti Monitoring</a></li>
+        <li><a href="lancache-server.html"><i class="fas fa-database"></i> Lancache Server</a></li>
+        <li><a href="issabel-pbx.html"><i class="fas fa-phone-alt"></i> Issabel PBX</a></li>
+        <li><a href="tv-server-flussonic.html"><i class="fas fa-tv"></i> TV Server with Flussonic</a></li>
+        <li><a href="xstream-server.html"><i class="fas fa-stream"></i> XStream Server</a></li>
+        <li><a href="virtualmin-roundcube.html"><i class="fas fa-envelope"></i> Virtualmin + Roundcube</a></li>
+        <li><a href="radarr-sonarr-bazarr.html"><i class="fas fa-film"></i> Radarr, Sonarr, Bazarr</a></li>
+        <li><a href="prowlarr.html"><i class="fas fa-search"></i> Prowlarr</a></li>
+        <li><a href="qbittorrent.html"><i class="fas fa-download"></i> qBittorrent</a></li>
+        <li><a href="ansible-automation.html"><i class="fas fa-cogs"></i> Ansible Automation</a></li>
+        <li><a href="docker-kubernetes.html"><i class="fab fa-docker"></i> Docker & Kubernetes</a></li>
+        <li><a href="wireguard-vpn.html"><i class="fas fa-shield-alt"></i> WireGuard VPN</a></li>
+        <li><a href="proxmox-ve.html"><i class="fas fa-cloud"></i> Proxmox VE</a></li>
+      </ul>
+    </aside>
+
+    <main class="project-details">
+      <h2>Redis Server Installation on Linux</h2>
+      <p>Redis is an open-source, in-memory data structure store used as a database, cache, and message broker. This tutorial covers installing and configuring Redis on Ubuntu and RHEL-based systems.</p>
+      
+      <div class="prerequisites">
+        <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+        <ul>
+          <li>Ubuntu 20.04/22.04 LTS or RHEL/Rocky Linux 8/9</li>
+          <li>Root or sudo privileges</li>
+          <li>Minimum 1GB RAM (2GB+ recommended for production)</li>
+          <li>At least 2GB of free disk space</li>
+          <li>Basic knowledge of Linux command line</li>
+        </ul>
+      </div>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="ubuntu">Ubuntu/Debian</div>
+        <div class="tab" data-tab="rhel">RHEL/CentOS</div>
+      </div>
+      
+      <div class="tab-content active" id="ubuntu-content">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Install Redis</h3>
+          <p>Update your package list and install Redis:</p>
+          <div class="command">
+            <pre><code>sudo apt update
+sudo apt install redis-server -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">2</span> Configure Redis</h3>
+          <p>Edit the Redis configuration file:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/redis/redis.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Make the following changes for basic configuration:</p>
+          <div class="command">
+            <pre><code># Bind to all interfaces (or specific IPs)
+bind 0.0.0.0
+
+# Set a strong password (optional but recommended)
+requirepass your_strong_password_here
+
+# Enable persistence
+appendonly yes
+appendfilename "appendonly.aof"
+
+# Set max memory policy
+maxmemory 256mb
+maxmemory-policy allkeys-lru</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">3</span> Start and Enable Redis Service</h3>
+          <p>Start the Redis service and enable it to start on boot:</p>
+          <div class="command">
+            <pre><code>sudo systemctl start redis-server
+sudo systemctl enable redis-server</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Check the service status:</p>
+          <div class="command">
+            <pre><code>sudo systemctl status redis-server</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">4</span> Test Redis Installation</h3>
+          <p>Connect to Redis using the command-line interface:</p>
+          <div class="command">
+            <pre><code>redis-cli</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Test basic operations:</p>
+          <div class="command">
+            <pre><code># If you set a password, authenticate first
+AUTH your_strong_password_here
+
+# Set a key-value pair
+SET test_key "Hello Redis"
+
+# Get the value
+GET test_key
+
+# Check server information
+INFO server
+
+# Exit Redis CLI
+EXIT</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">5</span> Configure Firewall</h3>
+          <p>Allow Redis through the firewall (default port 6379):</p>
+          <div class="command">
+            <pre><code>sudo ufw allow 6379/tcp
+sudo ufw enable
+sudo ufw status</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note">
+            <strong>Security Note:</strong> Only open port 6379 to trusted IP addresses in production environments. Consider using VPN or SSH tunneling for remote access.
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">6</span> Configure Redis as a Service</h3>
+          <p>Edit the Redis systemd service file for better control:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/systemd/system/redis.service</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Add the following content if the file doesn't exist:</p>
+          <div class="command">
+            <pre><code>[Unit]
+Description=Redis In-Memory Data Store
+After=network.target
+
+[Service]
+User=redis
+Group=redis
+ExecStart=/usr/bin/redis-server /etc/redis/redis.conf
+ExecStop=/usr/bin/redis-cli shutdown
+Restart=always
+
+[Install]
+WantedBy=multi-user.target</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Reload systemd and restart Redis:</p>
+          <div class="command">
+            <pre><code>sudo systemctl daemon-reload
+sudo systemctl restart redis-server</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">7</span> Enable Redis Persistence</h3>
+          <p>Redis supports two persistence methods. Edit the config file:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/redis/redis.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Configure RDB snapshots:</p>
+          <div class="command">
+            <pre><code># Save the dataset to disk every 60 seconds if at least 1000 keys changed
+save 60 1000
+
+# Compression
+rdbcompression yes
+
+# RDB filename
+dbfilename dump.rdb
+
+# Directory for RDB and AOF files
+dir /var/lib/redis</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Configure AOF (Append Only File) for better durability:</p>
+          <div class="command">
+            <pre><code># Enable AOF
+appendonly yes
+
+# AOF filename
+appendfilename "appendonly.aof"
+
+# fsync policy
+appendfsync everysec
+
+# Auto-rewrite AOF when it grows too large
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">8</span> Redis Security Configuration</h3>
+          <p>Enhance Redis security with these measures:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/redis/redis.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Add these security settings:</p>
+          <div class="command">
+            <pre><code># Rename dangerous commands
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
+rename-command CONFIG ""
+
+# Enable protected mode
+protected-mode yes
+
+# Use a non-default port
+port 6380
+
+# Limit client connections
+maxclients 10000
+
+# Set timeout for idle clients
+timeout 300</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Restart Redis to apply changes:</p>
+          <div class="command">
+            <pre><code>sudo systemctl restart redis-server</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">9</span> Test Redis Persistence</h3>
+          <p>Test that Redis data persistence is working correctly:</p>
+          <div class="command">
+            <pre><code>redis-cli
+
+# Authenticate if password is set
+AUTH your_strong_password_here
+
+# Set some test data
+SET persistent:test "This should survive restart"
+
+# Force save to disk
+SAVE
+
+# Check if data was saved
+LASTSAVE
+
+# Exit and restart Redis
+EXIT
+sudo systemctl restart redis-server
+
+# Reconnect and check if data persists
+redis-cli
+GET persistent:test</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">10</span> Monitor Redis Performance</h3>
+          <p>Use Redis CLI to monitor performance and statistics:</p>
+          <div class="command">
+            <pre><code>redis-cli
+
+# Get overall statistics
+INFO
+
+# Get memory statistics
+INFO memory
+
+# Get persistence statistics
+INFO persistence
+
+# Get client statistics
+INFO clients
+
+# Monitor commands in real-time
+MONITOR
+
+# Show slow logs (commands taking longer than 10ms)
+SLOWLOG GET 10</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Install redis-tools for additional utilities:</p>
+          <div class="command">
+            <pre><code>sudo apt install redis-tools -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="rhel-content">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Install Redis on RHEL-based Systems</h3>
+          <p>Enable EPEL repository and install Redis:</p>
+          <div class="command">
+            <pre><code># For RHEL 8/9, Rocky Linux, AlmaLinux
+sudo dnf install epel-release -y
+sudo dnf install redis -y
+
+# For CentOS 7
+sudo yum install epel-release -y
+sudo yum install redis -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">2</span> Configure Redis</h3>
+          <p>Edit the Redis configuration file:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/redis.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Make the following changes for basic configuration:</p>
+          <div class="command">
+            <pre><code># Bind to all interfaces (or specific IPs)
+bind 0.0.0.0
+
+# Set a strong password (optional but recommended)
+requirepass your_strong_password_here
+
+# Enable persistence
+appendonly yes
+appendfilename "appendonly.aof"
+
+# Set max memory policy
+maxmemory 256mb
+maxmemory-policy allkeys-lru
+
+# Change daemonize to no (for systemd)
+daemonize no</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">3</span> Start and Enable Redis Service</h3>
+          <p>Start the Redis service and enable it to start on boot:</p>
+          <div class="command">
+            <pre><code>sudo systemctl start redis
+sudo systemctl enable redis</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Check the service status:</p>
+          <div class="command">
+            <pre><code>sudo systemctl status redis</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">4</span> Configure SELinux for Redis</h3>
+          <p>If SELinux is enabled, configure it for Redis:</p>
+          <div class="command">
+            <pre><code># Check SELinux status
+sestatus
+
+# If enforcing, adjust SELinux policies
+sudo semanage port -a -t redis_port_t -p tcp 6379
+
+# Or set permissive mode for Redis (not recommended for production)
+sudo setsebool -P redis_can_network_connect 1</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">5</span> Configure Firewall</h3>
+          <p>Allow Redis through the firewall:</p>
+          <div class="command">
+            <pre><code>sudo firewall-cmd --permanent --add-port=6379/tcp
+sudo firewall-cmd --reload</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note">
+            <strong>Security Note:</strong> For production environments, consider restricting access to specific IP addresses only.
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">6</span> Test Redis Installation</h3>
+          <p>Connect to Redis using the command-line interface:</p>
+          <div class="command">
+            <pre><code>redis-cli</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Test basic operations:</p>
+          <div class="command">
+            <pre><code># If you set a password, authenticate first
+AUTH your_strong_password_here
+
+# Set a key-value pair
+SET test_key "Hello Redis"
+
+# Get the value
+GET test_key
+
+# Check server information
+INFO server
+
+# Exit Redis CLI
+EXIT</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">7</span> Configure Redis Persistence</h3>
+          <p>Edit the Redis configuration file for persistence:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/redis.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Configure RDB snapshots:</p>
+          <div class="command">
+            <pre><code># Save the dataset to disk every 60 seconds if at least 1000 keys changed
+save 60 1000
+
+# Compression
+rdbcompression yes
+
+# RDB filename
+dbfilename dump.rdb
+
+# Directory for RDB and AOF files
+dir /var/lib/redis</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Configure AOF (Append Only File):</p>
+          <div class="command">
+            <pre><code># Enable AOF
+appendonly yes
+
+# AOF filename
+appendfilename "appendonly.aof"
+
+# fsync policy
+appendfsync everysec
+
+# Auto-rewrite AOF when it grows too large
+auto-aof-rewrite-percentage 100
+auto-aof-rewrite-min-size 64mb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">8</span> Redis Security Configuration</h3>
+          <p>Enhance Redis security with these measures:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/redis.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Add these security settings:</p>
+          <div class="command">
+            <pre><code># Rename dangerous commands
+rename-command FLUSHDB ""
+rename-command FLUSHALL ""
+rename-command CONFIG ""
+
+# Enable protected mode
+protected-mode yes
+
+# Use a non-default port
+port 6380
+
+# Limit client connections
+maxclients 10000
+
+# Set timeout for idle clients
+timeout 300</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Restart Redis to apply changes:</p>
+          <div class="command">
+            <pre><code>sudo systemctl restart redis</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">9</span> Configure Redis Logging</h3>
+          <p>Configure Redis logging for better monitoring:</p>
+          <div class="command">
+            <pre><code>sudo nano /etc/redis.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Update logging configuration:</p>
+          <div class="command">
+            <pre><code># Set log level (debug, verbose, notice, warning)
+loglevel notice
+
+# Log file
+logfile /var/log/redis/redis.log
+
+# Syslog enabled
+syslog-enabled no
+
+# Syslog ident
+syslog-ident redis
+
+# Syslog facility
+syslog-facility local0
+
+# Set the number of databases
+databases 16</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Create log directory and set permissions:</p>
+          <div class="command">
+            <pre><code>sudo mkdir -p /var/log/redis
+sudo chown redis:redis /var/log/redis
+sudo systemctl restart redis</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">10</span> Redis Cluster Setup (Optional)</h3>
+          <p>For production environments, consider setting up Redis Cluster:</p>
+          <div class="command">
+            <pre><code># Install Ruby and redis gem for redis-trib
+sudo dnf install ruby -y
+sudo gem install redis
+
+# Create cluster configuration directories
+sudo mkdir -p /etc/redis/cluster
+sudo mkdir -p /var/lib/redis/cluster
+
+# Create multiple Redis instances for cluster
+for port in {7000..7005}
+do
+  sudo mkdir -p /var/lib/redis/cluster/${port}
+  sudo cp /etc/redis.conf /etc/redis/cluster/${port}.conf
+done</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Configure each cluster instance:</p>
+          <div class="command">
+            <pre><code># Edit each cluster node configuration
+sudo nano /etc/redis/cluster/7000.conf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Add cluster-specific settings:</p>
+          <div class="command">
+            <pre><code>port 7000
+cluster-enabled yes
+cluster-config-file nodes-7000.conf
+cluster-node-timeout 5000
+appendonly yes
+daemonize yes
+pidfile /var/run/redis_7000.pid
+logfile /var/log/redis/redis_7000.log
+dir /var/lib/redis/cluster/7000</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note">
+            <strong>Note:</strong> Redis Cluster requires at least 3 master nodes for a production environment. For development, you can set up a cluster on a single machine with different ports.
+          </div>
+        </div>
+      </div>
+
+      <div class="tutorial-nav">
+        <a href="mongodb-server.html"><i class="fas fa-arrow-left"></i> Previous: MongoDB Server</a>
+        <a href="cacti-monitoring.html">Next: Cacti Monitoring <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </main>
+  </div>
+
+  <div class="success-message" id="copy-success">
+    <i class="fas fa-check-circle"></i> Command copied to clipboard!
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Tab functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Show the selected tab content
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(`${tabId}-content`).classList.add('active');
+      });
+    });
+
+    // Copy to clipboard functionality
+    document.querySelectorAll('.command-copy').forEach(button => {
+      button.addEventListener('click', function() {
+        const code = this.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          const successMsg = document.getElementById('copy-success');
+          successMsg.style.display = 'block';
+          setTimeout(() => {
+            successMsg.style.display = 'none';
+          }, 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

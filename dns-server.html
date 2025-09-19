@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DNS Server on Ubuntu - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Improved Light Color Scheme and Typography */
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+      --border: #cbd5e1;
+      --accent: #f59e0b;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--light-gray);
+    }
+    
+    /* Header Styles */
+    header {
+      background: var(--light);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s;
+    }
+    
+    nav a:hover {
+      color: var(--primary);
+    }
+    
+    nav a.active {
+      color: var(--primary);
+    }
+    
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 1200px;
+      margin: 1rem auto 0;
+      padding: 0 1.5rem;
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+    }
+    
+    .breadcrumb a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Main Content Layout */
+    .project-content {
+      max-width: 1200px;
+      margin: 1rem auto 2rem;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 2rem;
+    }
+    
+    /* Sidebar Navigation */
+    .project-nav {
+      background: var(--light);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      height: fit-content;
+      position: sticky;
+      top: 90px;
+    }
+    
+    .project-nav h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid var(--medium-gray);
+      font-size: 1.3rem;
+    }
+    
+    .project-nav ul {
+      list-style: none;
+    }
+    
+    .project-nav li {
+      margin: 0.8rem 0;
+    }
+    
+    .project-nav a {
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .project-nav a:hover {
+      background: var(--primary-light);
+      color: white;
+    }
+    
+    .project-nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Main Content Area */
+    .project-details {
+      background: var(--light);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .project-details h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+    
+    .project-details p {
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+    
+    /* Section Styles */
+    .prerequisites {
+      background: var(--light-gray);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .prerequisites h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    
+    .prerequisites ul {
+      padding-left: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    .prerequisites li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .step-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .step-section h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .step-section h3 .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+    
+    /* Code Blocks */
+    pre {
+      background: var(--light-gray);
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      border: 1px solid var(--medium-gray);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    code {
+      color: var(--secondary);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+    }
+    
+    /* Note Box */
+    .note {
+      background: #fffbeb;
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .note strong {
+      color: var(--accent);
+    }
+    
+    /* Footer */
+    footer {
+      background: var(--light);
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 3rem;
+      border-top: 1px solid var(--medium-gray);
+      color: var(--dark-gray);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .project-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .project-nav {
+        position: static;
+        margin-bottom: 1.5rem;
+      }
+      
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+      }
+      
+      nav {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .project-content {
+        padding: 0 1rem;
+      }
+      
+      .project-details, .project-nav {
+        padding: 1.2rem;
+      }
+      
+      .project-details h2 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Additional Styling */
+    .command {
+      position: relative;
+    }
+    
+    .command-copy {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--primary-light);
+      color: white;
+      border: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.3s;
+    }
+    
+    .command-copy:hover {
+      background: var(--primary);
+    }
+    
+    .success-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 1000;
+    }
+    
+    /* Tutorial navigation */
+    .tutorial-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--medium-gray);
+    }
+    
+    .tutorial-nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tutorial-nav a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; DNS Server on Ubuntu
+  </div>
+
+  <div class="project-content">
+    <aside class="project-nav">
+      <h3>Server Projects</h3>
+      <ul>
+        <li><a href="dns-server.html" class="active"><i class="fas fa-network-wired"></i> DNS Server on Ubuntu</a></li>
+        <li><a href="web-server.html"><i class="fas fa-server"></i> Web Server</a></li>
+        <li><a href="cacti-monitoring.html"><i class="fas fa-chart-line"></i> Cacti Monitoring</a></li>
+        <li><a href="lancache-server.html"><i class="fas fa-database"></i> Lancache Server</a></li>
+        <li><a href="issabel-pbx.html"><i class="fas fa-phone-alt"></i> Issabel PBX</a></li>
+        <li><a href="tv-server-flussonic.html"><i class="fas fa-tv"></i> TV Server with Flussonic</a></li>
+        <li><a href="xstream-server.html"><i class="fas fa-stream"></i> XStream Server</a></li>
+        <li><a href="virtualmin-roundcube.html"><i class="fas fa-envelope"></i> Virtualmin + Roundcube</a></li>
+        <li><a href="radarr-sonarr-bazarr.html"><i class="fas fa-film"></i> Radarr, Sonarr, Bazarr</a></li>
+        <li><a href="prowlarr.html"><i class="fas fa-search"></i> Prowlarr</a></li>
+        <li><a href="qbittorrent.html"><i class="fas fa-download"></i> qBittorrent</a></li>
+        <li><a href="ansible-automation.html"><i class="fas fa-cogs"></i> Ansible Automation</a></li>
+        <li><a href="docker-kubernetes.html"><i class="fab fa-docker"></i> Docker & Kubernetes</a></li>
+        <li><a href="wireguard-vpn.html"><i class="fas fa-shield-alt"></i> WireGuard VPN</a></li>
+        <li><a href="proxmox-ve.html"><i class="fas fa-cloud"></i> Proxmox VE</a></li>
+      </ul>
+    </aside>
+
+    <main class="project-details">
+      <h2>DNS Server on Ubuntu using BIND9</h2>
+      <p>A DNS (Domain Name System) server translates human-readable domain names into IP addresses. Setting up your own DNS server gives you control over domain resolution on your network and is a fundamental skill for system administrators.</p>
+      
+      <div class="prerequisites">
+        <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+        <ul>
+          <li>Ubuntu Server 20.04 LTS or newer</li>
+          <li>Root or sudo privileges</li>
+          <li>Static IP address configured on your server</li>
+          <li>Basic knowledge of Linux command line</li>
+        </ul>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">1</span> Install BIND9 DNS Server</h3>
+        <p>Update your package list and install BIND9 (Berkeley Internet Name Domain):</p>
+        <div class="command">
+          <pre><code>sudo apt update
+sudo apt install bind9 bind9-utils bind9-doc -y</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>BIND9 is the most widely used DNS software on the Internet, providing both authoritative and recursive name services.</p>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">2</span> Configure BIND9 Options</h3>
+        <p>Edit the main BIND9 configuration file:</p>
+        <div class="command">
+          <pre><code>sudo nano /etc/bind/named.conf.options</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Add the following configuration inside the options block:</p>
+        <div class="command">
+          <pre><code>options {
+  directory "/var/cache/bind";
+  
+  // If your DNS server should be recursive (open DNS)
+  recursion yes;
+  allow-recursion { any; };
+  
+  // If your DNS server should be authoritative only
+  // recursion no;
+  // allow-recursion { none; };
+  
+  // Allow queries from any client
+  allow-query { any; };
+  
+  // Forwarders to use for DNS resolution
+  forwarders {
+      8.8.8.8;
+      8.8.4.4;
+  };
+  
+  // DNS security extensions
+  dnssec-validation auto;
+  
+  listen-on { any; };
+  listen-on-v6 { any; };
+};</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <div class="note">
+          <strong>Note:</strong> For a production environment, restrict recursion and queries to your local network only for security reasons.
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">3</span> Create a Forward Lookup Zone</h3>
+        <p>Create a new zone file for your domain. First, edit named.conf.local:</p>
+        <div class="command">
+          <pre><code>sudo nano /etc/bind/named.conf.local</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Add the following zone configuration (replace example.com with your domain):</p>
+        <div class="command">
+          <pre><code>zone "example.com" {
+  type master;
+  file "/etc/bind/zones/db.example.com";
+};</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Create the zones directory and the zone file:</p>
+        <div class="command">
+          <pre><code>sudo mkdir /etc/bind/zones
+sudo nano /etc/bind/zones/db.example.com</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">4</span> Verify Configuration and Restart BIND9</h3>
+        <p>Check your configuration files for syntax errors:</p>
+        <div class="command">
+          <pre><code>sudo named-checkconf
+sudo named-checkzone example.com /etc/bind/zones/db.example.com</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>If all checks pass without errors, restart BIND9:</p>
+        <div class="command">
+          <pre><code>sudo systemctl restart bind9</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Check the status to ensure it's running properly:</p>
+        <div class="command">
+          <pre><code>sudo systemctl status bind9</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">5</span> Configure Firewall and Test DNS Server</h3>
+        <p>Allow DNS traffic through the firewall (if enabled):</p>
+        <div class="command">
+          <pre><code>sudo ufw allow 53/tcp
+sudo ufw allow 53/udp</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Test your DNS server using dig or nslookup:</p>
+        <div class="command">
+          <pre><code>dig @localhost www.example.com
+nslookup www.example.com localhost</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">6</span> Security Considerations</h3>
+        <ul>
+          <li>Run BIND in a chroot jail for increased security</li>
+          <li>Limit zone transfers to specific IP addresses</li>
+          <li>Use TSIG (Transaction Signature) for secure server-to-server communication</li>
+          <li>Keep BIND9 updated with security patches</li>
+          <li>Regularly monitor logs for suspicious activities</li>
+        </ul>
+      </div>
+
+      <div class="tutorial-nav">
+        <span></span>
+        <a href="web-server.html">Next: Web Server <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </main>
+  </div>
+
+  <div class="success-message" id="copySuccess">
+    Command copied to clipboard!
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Copy to clipboard functionality
+    document.querySelectorAll('.command-copy').forEach(button => {
+      button.addEventListener('click', function() {
+        const code = this.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          const message = document.getElementById('copySuccess');
+          message.style.display = 'block';
+          setTimeout(() => {
+            message.style.display = 'none';
+          }, 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

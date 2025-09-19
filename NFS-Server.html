@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFS Server Configuration - LearnLinuxOnline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --text: #334155;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+        }
+        
+        header {
+            background: var(--light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a.active {
+            color: var(--primary);
+        }
+        
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .breadcrumb {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .project-content {
+            max-width: 1200px;
+            margin: 1rem auto 2rem;
+            padding: 0 1.5rem;
+        }
+        
+        .project-details {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .project-details h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .project-details p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .prerequisites {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .prerequisites h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .prerequisites ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+        
+        .prerequisites li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .step-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-section h3 .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        
+        pre {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            border: 1px solid var(--medium-gray);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        code {
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .note {
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .note strong {
+            color: var(--accent);
+        }
+        
+        .warning {
+            background: #fef2f2;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .warning strong {
+            color: #ef4444;
+        }
+        
+        .info {
+            background: #eff6ff;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info strong {
+            color: var(--primary);
+        }
+        
+        footer {
+            background: var(--light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            nav {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .project-content {
+                padding: 0 1rem;
+            }
+            
+            .project-details {
+                padding: 1.2rem;
+            }
+            
+            .project-details h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .command {
+            position: relative;
+        }
+        
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .command-copy:hover {
+            background: var(--primary);
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .tutorial-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .tutorial-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tutorial-nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .config-table th, .config-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .config-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        .config-table tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LearnLinuxOnline</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="courses.html">Courses</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &raquo; NFS Server on Ubuntu 20.04
+    </div>
+
+    <div class="project-content">
+        <main class="project-details">
+            <h2>NFS Server Configuration on Ubuntu 20.04 LTS</h2>
+            <p>NFS (Network File System) is a distributed file system protocol that allows you to share directories and files with others over a network. With NFS, users can access files on remote systems as if they were local files.</p>
+            
+            <div class="prerequisites">
+                <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+                <ul>
+                    <li>Ubuntu 20.04 LTS server</li>
+                    <li>Minimum 1GB RAM (2GB recommended)</li>
+                    <li>Sufficient disk space for your shared storage needs</li>
+                    <li>Root or sudo privileges</li>
+                    <li>Static IP address configured</li>
+                    <li>Basic knowledge of Linux command line</li>
+                </ul>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">1</span> System Preparation</h3>
+                <p>Update your system and set the hostname:</p>
+                <div class="command">
+                    <pre><code>sudo apt update && sudo apt upgrade -y
+sudo hostnamectl set-hostname nfs-server
+exec bash</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Install necessary utilities:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y wget curl nano</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">2</span> Install NFS Server</h3>
+                <p>Install the NFS server package:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y nfs-kernel-server</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check if NFS services are running:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status nfs-server</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Enable NFS to start on boot:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl enable nfs-server</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">3</span> Create Shared Directory</h3>
+                <p>Create a directory for sharing:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /srv/nfs/share1</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Set appropriate permissions:</p>
+                <div class="command">
+                    <pre><code>sudo chown nobody:nogroup /srv/nfs/share1
+sudo chmod 777 /srv/nfs/share1</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <div class="note">
+                    <strong>Note:</strong> These permissions allow anyone to read and write to the share. For more secure configurations, see the advanced section.
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">4</span> Configure NFS Exports</h3>
+                <p>Edit the exports file to define shared directories:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/exports</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add the following lines to share your directory (replace client_ip with appropriate values):</p>
+                <div class="command">
+                    <pre><code># Basic share - read/write to specific client
+/srv/nfs/share1 client_ip(rw,sync,no_subtree_check)
+
+# Read-only share to a network
+/srv/nfs/share2 192.168.1.0/24(ro,sync,no_subtree_check)
+
+# Share with multiple options
+/srv/nfs/share3 client_ip(rw,sync,no_subtree_check,no_root_squash)</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common NFS export options:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Option</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>rw</td>
+                        <td>Read-write access</td>
+                    </tr>
+                    <tr>
+                        <td>ro</td>
+                        <td>Read-only access</td>
+                    </tr>
+                    <tr>
+                        <td>sync</td>
+                        <td>Reply to requests only after changes committed</td>
+                    </tr>
+                    <tr>
+                        <td>async</td>
+                        <td>Reply to requests before changes committed</td>
+                    </tr>
+                    <tr>
+                        <td>no_subtree_check</td>
+                        <td>Disable subtree checking (improves reliability)</td>
+                    </tr>
+                    <tr>
+                        <td>root_squash</td>
+                        <td>Map root user to anonymous (default)</td>
+                    </tr>
+                    <tr>
+                        <td>no_root_squash</td>
+                        <td>Allow root access on client (security risk)</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">5</span> Apply NFS Configuration</h3>
+                <p>Export the shared directories:</p>
+                <div class="command">
+                    <pre><code>sudo exportfs -a</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Restart the NFS server to apply changes:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart nfs-server</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the exports:</p>
+                <div class="command">
+                    <pre><code>sudo exportfs -v</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Show the current export list:</p>
+                <div class="command">
+                    <pre><code>showmount -e</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">6</span> Configure Firewall</h3>
+                <p>Allow NFS through the firewall:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow from client_ip to any port nfs
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Alternatively, open specific ports for NFS:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow 2049/tcp
+sudo ufw allow 2049/udp
+sudo ufw allow 111/tcp
+sudo ufw allow 111/udp
+sudo ufw allow from client_ip to any port 2049
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the firewall status:</p>
+                <div class="command">
+                    <pre><code>sudo ufw status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">7</span> NFS Client Configuration</h3>
+                <p>On the client machine, install NFS client packages:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y nfs-common</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create a mount point on the client:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /mnt/nfs/share1</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Mount the NFS share temporarily:</p>
+                <div class="command">
+                    <pre><code>sudo mount nfs-server-ip:/srv/nfs/share1 /mnt/nfs/share1</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the mount was successful:</p>
+                <div class="command">
+                    <pre><code>df -hT</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">8</span> Permanent Mount Configuration</h3>
+                <p>Edit the fstab file for automatic mounting at boot:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/fstab</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add the following line to the end of the file:</p>
+                <div class="command">
+                    <pre><code>nfs-server-ip:/srv/nfs/share1  /mnt/nfs/share1  nfs  defaults,timeo=900,retrans=5,_netdev  0  0</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common fstab options for NFS:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Option</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>defaults</td>
+                        <td>Use default mount options</td>
+                    </tr>
+                    <tr>
+                        <td>timeo=900</td>
+                        <td>Timeout in tenths of a second (90 seconds)</td>
+                    </tr>
+                    <tr>
+                        <td>retrans=5</td>
+                        <td>Number of retransmission attempts</td>
+                    </tr>
+                    <tr>
+                        <td>_netdev</td>
+                        <td>Wait for network to be available</td>
+                    </tr>
+                    <tr>
+                        <td>soft</td>
+                        <td>Allow I/O operations to fail after retries</td>
+                    </tr>
+                    <tr>
+                        <td>hard</td>
+                        <td>Keep retrying indefinitely (default)</td>
+                    </tr>
+                </table>
+                <p>Test the fstab configuration:</p>
+                <div class="command">
+                    <pre><code>sudo mount -a</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">9</span> Advanced Configuration</h3>
+                <p>Configure user ID mapping for consistent permissions:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/idmapd.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Set the domain to match your network (if applicable):</p>
+                <div class="command">
+                    <pre><code>Domain = yourdomain.com</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create a more secure export with specific user mapping:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/exports</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add a secure share configuration:</p>
+                <div class="command">
+                    <pre><code>/srv/nfs/secure client_ip(rw,sync,all_squash,anonuid=1000,anongid=1000,no_subtree_check)</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Set up NFS with Kerberos security (advanced):</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y nfs-kernel-server krb5-config krb5-user
+sudo nano /etc/exports</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add Kerberos-secured export:</p>
+                <div class="command">
+                    <pre><code>/srv/nfs/krb5 client_ip(rw,sync,sec=krb5p,no_subtree_check)</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">10</span> Testing and Monitoring</h3>
+                <p>Test NFS functionality from the client:</p>
+                <div class="command">
+                    <pre><code># Create a test file
+echo "NFS Test File" | sudo tee /mnt/nfs/share1/testfile.txt
+
+# Check file ownership and permissions
+ls -la /mnt/nfs/share1/testfile.txt</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Monitor NFS server performance:</p>
+                <div class="command">
+                    <pre><code># Show NFS statistics
+nfsstat
+
+# Show mounted shares
+showmount
+
+# Monitor NFS in real-time
+sudo watch -n 1 'nfsstat -c; echo ---; nfsstat -s'</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check NFS server status and logs:</p>
+                <div class="command">
+                    <pre><code># Check service status
+sudo systemctl status nfs-server
+
+# View NFS logs
+sudo tail -f /var/log/syslog | grep nfs</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">11</span> Troubleshooting Common Issues</h3>
+                <p>Check NFS service status:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status nfs-server nfs-mountd
+sudo rpcinfo -p</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check NFS exports and connections:</p>
+                <div class="command">
+                    <pre><code>sudo exportfs -v
+showmount -e localhost
+showmount -a</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check network connectivity and ports:</p>
+                <div class="command">
+                    <pre><code>sudo netstat -tulnp | grep nfs
+rpcinfo -p nfs-server-ip</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common issues and solutions:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Permission denied errors</td>
+                        <td>Check export options and directory permissions</td>
+                    </tr>
+                    <tr>
+                        <td>Mount hangs or times out</td>
+                        <td>Check firewall settings and network connectivity</td>
+                    </tr>
+                    <tr>
+                        <td>Stale file handle errors</td>
+                        <td>Export might have been changed, remount the share</td>
+                    </tr>
+                    <tr>
+                        <td>Read-only filesystem errors</td>
+                        <td>Check if export is configured as ro instead of rw</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tutorial-nav">
+                <a href="samba-server.html"><i class="fas fa-arrow-left"></i> Previous: Samba Server</a>
+                <a href="ftp-server.html">Next: FTP Server <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <div class="success-message" id="copy-success">
+        <i class="fas fa-check-circle"></i> Command copied to clipboard!
+    </div>
+
+    <footer>
+        <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.command-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.previousElementSibling.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const successMsg = document.getElementById('copy-success');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cacti Monitoring Setup - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Improved Light Color Scheme and Typography */
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+      --border: #cbd5e1;
+      --accent: #f59e0b;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--light-gray);
+    }
+    
+    /* Header Styles */
+    header {
+      background: var(--light);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s;
+    }
+    
+    nav a:hover {
+      color: var(--primary);
+    }
+    
+    nav a.active {
+      color: var(--primary);
+    }
+    
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 1200px;
+      margin: 1rem auto 0;
+      padding: 0 1.5rem;
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+    }
+    
+    .breadcrumb a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Main Content Layout */
+    .project-content {
+      max-width: 1200px;
+      margin: 1rem auto 2rem;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 2rem;
+    }
+    
+    /* Sidebar Navigation */
+    .project-nav {
+      background: var(--light);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      height: fit-content;
+      position: sticky;
+      top: 90px;
+    }
+    
+    .project-nav h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid var(--medium-gray);
+      font-size: 1.3rem;
+    }
+    
+    .project-nav ul {
+      list-style: none;
+    }
+    
+    .project-nav li {
+      margin: 0.8rem 0;
+    }
+    
+    .project-nav a {
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .project-nav a:hover {
+      background: var(--primary-light);
+      color: white;
+    }
+    
+    .project-nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Main Content Area */
+    .project-details {
+      background: var(--light);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .project-details h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+    
+    .project-details p {
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+    
+    /* Section Styles */
+    .prerequisites {
+      background: var(--light-gray);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .prerequisites h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    
+    .prerequisites ul {
+      padding-left: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    .prerequisites li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .step-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .step-section h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .step-section h3 .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+    
+    /* Code Blocks */
+    pre {
+      background: var(--light-gray);
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      border: 1px solid var(--medium-gray);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    code {
+      color: var(--secondary);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+    }
+    
+    /* Note Box */
+    .note {
+      background: #fffbeb;
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .note strong {
+      color: var(--accent);
+    }
+    
+    /* Warning Box */
+    .warning {
+      background: #fef2f2;
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      border-left: 4px solid #ef4444;
+    }
+    
+    .warning strong {
+      color: #ef4444;
+    }
+    
+    /* Info Box */
+    .info {
+      background: #eff6ff;
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      border-left: 4px solid var(--primary);
+    }
+    
+    .info strong {
+      color: var(--primary);
+    }
+    
+    /* Footer */
+    footer {
+      background: var(--light);
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 3rem;
+      border-top: 1px solid var(--medium-gray);
+      color: var(--dark-gray);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .project-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .project-nav {
+        position: static;
+        margin-bottom: 1.5rem;
+      }
+      
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+      }
+      
+      nav {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .project-content {
+        padding: 0 1rem;
+      }
+      
+      .project-details, .project-nav {
+        padding: 1.2rem;
+      }
+      
+      .project-details h2 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Additional Styling */
+    .command {
+      position: relative;
+    }
+    
+    .command-copy {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--primary-light);
+      color: white;
+      border: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.3s;
+    }
+    
+    .command-copy:hover {
+      background: var(--primary);
+    }
+    
+    .success-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 1000;
+    }
+    
+    /* Tutorial navigation */
+    .tutorial-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--medium-gray);
+    }
+    
+    .tutorial-nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tutorial-nav a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Image styling */
+    .tutorial-image {
+      width: 100%;
+      border-radius: 8px;
+      margin: 1rem 0;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--border);
+    }
+    
+    /* Table styling */
+    .config-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+    }
+    
+    .config-table th, .config-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    
+    .config-table th {
+      background-color: var(--light-gray);
+      font-weight: 600;
+    }
+    
+    .config-table tr:nth-child(even) {
+      background-color: var(--light-gray);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; Cacti Monitoring Setup
+  </div>
+
+  <div class="project-content">
+    <aside class="project-nav">
+      <h3>Server Projects</h3>
+      <ul>
+        <li><a href="dns-server.html"><i class="fas fa-network-wired"></i> DNS Server on Ubuntu</a></li>
+        <li><a href="web-server.html"><i class="fas fa-server"></i> Web Server</a></li>
+        <li><a href="cacti-monitoring.html" class="active"><i class="fas fa-chart-line"></i> Cacti Monitoring</a></li>
+        <li><a href="lancache-server.html"><i class="fas fa-database"></i> Lancache Server</a></li>
+        <li><a href="issabel-pbx.html"><i class="fas fa-phone-alt"></i> Issabel PBX</a></li>
+        <li><a href="tv-server-flussonic.html"><i class="fas fa-tv"></i> TV Server with Flussonic</a></li>
+        <li><a href="xstream-server.html"><i class="fas fa-stream"></i> XStream Server</a></li>
+        <li><a href="virtualmin-roundcube.html"><i class="fas fa-envelope"></i> Virtualmin + Roundcube</a></li>
+        <li><a href="radarr-sonarr-bazarr.html"><i class="fas fa-film"></i> Radarr, Sonarr, Bazarr</a></li>
+        <li><a href="prowlarr.html"><i class="fas fa-search"></i> Prowlarr</a></li>
+        <li><a href="qbittorrent.html"><i class="fas fa-download"></i> qBittorrent</a></li>
+        <li><a href="ansible-automation.html"><i class="fas fa-cogs"></i> Ansible Automation</a></li>
+        <li><a href="docker-kubernetes.html"><i class="fab fa-docker"></i> Docker & Kubernetes</a></li>
+        <li><a href="wireguard-vpn.html"><i class="fas fa-shield-alt"></i> WireGuard VPN</a></li>
+        <li><a href="proxmox-ve.html"><i class="fas fa-cloud"></i> Proxmox VE</a></li>
+      </ul>
+    </aside>
+
+    <main class="project-details">
+      <h2>Cacti Network Monitoring Setup</h2>
+      <p>Cacti is a complete network graphing solution designed to harness the power of RRDTool's data storage and graphing functionality. It provides a robust and extensible operational monitoring and fault management framework.</p>
+      
+      <div class="prerequisites">
+        <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+        <ul>
+          <li>Ubuntu Server 20.04 LTS or 22.04 LTS</li>
+          <li>Minimum 2GB RAM (4GB recommended for larger deployments)</li>
+          <li>20GB+ of disk space</li>
+          <li>Root or sudo privileges</li>
+          <li>LAMP stack (Linux, Apache, MySQL/MariaDB, PHP)</li>
+          <li>Basic knowledge of Linux command line</li>
+        </ul>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">1</span> System Update and Preparation</h3>
+        <p>Start by updating your system packages to the latest versions:</p>
+        <div class="command">
+          <pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install -y software-properties-common</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Set the hostname for your monitoring server (optional but recommended):</p>
+        <div class="command">
+          <pre><code>sudo hostnamectl set-hostname cacti-monitor
+exec bash</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">2</span> Install LAMP Stack</h3>
+        <p>Install Apache web server, MySQL database, and PHP with required extensions:</p>
+        <div class="command">
+          <pre><code>sudo apt install -y apache2 mariadb-server mariadb-client \
+php php-mysql php-ldap php-snmp php-gd php-xml php-mbstring \
+php-json php-curl php-zip php-intl</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Verify that Apache is running:</p>
+        <div class="command">
+          <pre><code>sudo systemctl status apache2</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Secure your MySQL installation:</p>
+        <div class="command">
+          <pre><code>sudo mysql_secure_installation</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <div class="note">
+          <strong>Note:</strong> Follow the prompts to set a root password and secure your database installation.
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">3</span> Install Required Dependencies</h3>
+        <p>Install SNMP and other required packages for Cacti:</p>
+        <div class="command">
+          <pre><code>sudo apt install -y snmp snmpd rrdtool librrds-perl \
+help2man libssl-dev libmysqlclient-dev</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Verify SNMP is working:</p>
+        <div class="command">
+          <pre><code>snmpwalk -v 2c -c public localhost .1.3.6.1.2.1.1.1.0</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">4</span> Install Cacti</h3>
+        <p>Add the Cacti repository and install the package:</p>
+        <div class="command">
+          <pre><code>sudo add-apt-repository -y ppa:andreas-boettger/cacti
+sudo apt update
+sudo apt install -y cacti</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <div class="info">
+          <strong>Info:</strong> During installation, you'll be prompted to configure the database. Select your web server (apache2) and configure the database for Cacti.
+        </div>
+        <p>If you encounter any issues with the PPA, you can install Cacti directly from the Ubuntu repositories:</p>
+        <div class="command">
+          <pre><code>sudo apt install -y cacti cacti-spine</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">5</span> Database Configuration</h3>
+        <p>Log into MySQL and create a dedicated database for Cacti:</p>
+        <div class="command">
+          <pre><code>sudo mysql -u root -p</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Within the MySQL prompt, execute these commands (replace 'password' with a strong password):</p>
+        <div class="command">
+          <pre><code>CREATE DATABASE cacti DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+GRANT ALL PRIVILEGES ON cacti.* TO 'cactiuser'@'localhost' IDENTIFIED BY 'your_strong_password';
+FLUSH PRIVILEGES;
+EXIT;</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Import the Cacti database schema:</p>
+        <div class="command">
+          <pre><code>sudo mysql -u root -p cacti < /usr/share/doc/cacti/cacti.sql</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">6</span> Configure Cacti Database Connection</h3>
+        <p>Edit the Cacti configuration file to set up the database connection:</p>
+        <div class="command">
+          <pre><code>sudo nano /etc/cacti/debian.php</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Update the database configuration with your credentials:</p>
+        <div class="command">
+          <pre><code>$database_type = "mysql";
+$database_default = "cacti";
+$database_hostname = "localhost";
+$database_username = "cactiuser";
+$database_password = "your_strong_password";
+$database_port = "3306";
+$database_ssl = false;</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <div class="warning">
+          <strong>Warning:</strong> Make sure to use the actual password you set for the cactiuser database account.
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">7</span> Configure Apache for Cacti</h3>
+        <p>Enable the Cacti site in Apache:</p>
+        <div class="command">
+          <pre><code>sudo a2ensite cacti
+sudo systemctl reload apache2</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Adjust PHP settings for Cacti:</p>
+        <div class="command">
+          <pre><code>sudo nano /etc/php/8.1/apache2/php.ini</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Make sure these settings are configured (adjust the PHP version in the path as needed):</p>
+        <div class="command">
+          <pre><code>memory_limit = 512M
+max_execution_time = 60
+date.timezone = America/New_York  # Set to your timezone</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Restart Apache to apply the changes:</p>
+        <div class="command">
+          <pre><code>sudo systemctl restart apache2</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">8</span> Configure Cacti Poller</h3>
+        <p>Set up the Cacti poller cron job:</p>
+        <div class="command">
+          <pre><code>sudo nano /etc/cron.d/cacti</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Ensure the poller is set to run every 5 minutes:</p>
+        <div class="command">
+          <pre><code>*/5 * * * * www-data php /usr/share/cacti/site/poller.php > /dev/null 2>&1</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Install and configure Spine for better performance (optional but recommended):</p>
+        <div class="command">
+          <pre><code>sudo apt install -y cacti-spine
+sudo nano /etc/spine.conf</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Update the Spine configuration with your database credentials:</p>
+        <div class="command">
+          <pre><code>DB_Host localhost
+DB_Database cacti
+DB_User cactiuser
+DB_Pass your_strong_password
+DB_Port 3306</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">9</span> Complete Web Installation</h3>
+        <p>Open your web browser and navigate to your Cacti installation:</p>
+        <div class="command">
+          <pre><code>http://your_server_ip/cacti</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Follow the web-based installation wizard:</p>
+        <ol>
+          <li>Select "New Install"</li>
+          <li>Verify all pre-installation checks pass</li>
+          <li>Click "Next" through the license agreement</li>
+          <li>Select "Linux" as the OS and "Local" as the database</li>
+          <li>Verify the paths and click "Finish"</li>
+        </ol>
+        <div class="note">
+          <strong>Note:</strong> The default login credentials are:
+          <ul>
+            <li>Username: <code>admin</code></li>
+            <li>Password: <code>admin</code></li>
+          </ul>
+          You will be forced to change the password on first login.
+        </div>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">10</span> Basic Cacti Configuration</h3>
+        <p>After logging in, configure the basic settings:</p>
+        <ol>
+          <li>Go to "Configuration" -> "Settings"</li>
+          <li>Configure general settings (paths, polling interval, etc.)</li>
+          <li>Set up email alerts under the "Mail/Reporting/DNS" tab</li>
+          <li>Configure the "Poller" tab to use Spine if installed</li>
+        </ol>
+        <p>Add your first device to monitor:</p>
+        <ol>
+          <li>Go to "Management" -> "Devices"</li>
+          <li>Click "Add"</li>
+          <li>Fill in the device details (description, hostname, etc.)</li>
+          <li>Select the appropriate template (e.g., "Generic SNMP-enabled Host")</li>
+          <li>Click "Create"</li>
+        </ol>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">11</span> Create Graphs and Data Sources</h3>
+        <p>For each device, create graphs to visualize performance data:</p>
+        <ol>
+          <li>Go to "Management" -> "Devices" and select your device</li>
+          <li>Click "Create Graphs for this Host"</li>
+          <li>Select the graph templates you want to use</li>
+          <li>Click "Create"</li>
+        </ol>
+        <p>Create a tree structure to organize your devices:</p>
+        <ol>
+          <li>Go to "Management" -> "Graph Trees"</li>
+          <li>Click "Add" to create a new tree or edit the default tree</li>
+          <li>Add devices to the tree structure</li>
+        </ol>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">12</span> Advanced Configuration</h3>
+        <p>Install additional plugins to extend Cacti's functionality:</p>
+        <div class="command">
+          <pre><code>cd /usr/share/cacti/site/plugins
+sudo git clone https://github.com/Cacti/plugin_thold.git thold
+sudo git clone https://github.com/Cacti/plugin_monitor.git monitor
+sudo chown -R www-data:www-data /usr/share/cacti/site/plugins</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Enable the plugins in the Cacti web interface:</p>
+        <ol>
+          <li>Go to "Configuration" -> "Plugin Management"</li>
+          <li>Install the plugins by clicking the "Install" button</li>
+          <li>Enable the plugins by toggling the status</li>
+        </ol>
+        <p>Configure thresholds and alerts using the thold plugin.</p>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">13</span> Troubleshooting Common Issues</h3>
+        <p>Check the Cacti log for errors:</p>
+        <div class="command">
+          <pre><code>tail -f /var/log/cacti/cacti.log</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>If graphs are not being created, check the poller:</p>
+        <div class="command">
+          <pre><code>sudo -u www-data php /usr/share/cacti/site/poller.php --force</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Common issues and solutions:</p>
+        <table class="config-table">
+          <tr>
+            <th>Issue</th>
+            <th>Solution</th>
+          </tr>
+          <tr>
+            <td>Graphs not displaying</td>
+            <td>Check RRDtool permissions and paths</td>
+          </tr>
+          <tr>
+            <td>Poller not running</td>
+            <td>Verify cron job is active and check permissions</td>
+          </tr>
+          <tr>
+            <td>SNMP timeouts</td>
+            <td>Check SNMP configuration on target devices</td>
+          </tr>
+          <tr>
+            <td>Database connection errors</td>
+            <td>Verify database credentials in config files</td>
+          </tr>
+        </table>
+      </div>
+      
+      <div class="step-section">
+        <h3><span class="step-number">14</span> Maintenance and Updates</h3>
+        <p>Backup your Cacti configuration and data:</p>
+        <div class="command">
+          <pre><code># Backup database
+mysqldump -u root -p cacti > cacti_backup_$(date +%Y%m%d).sql
+
+# Backup configuration and RRD files
+tar -czf cacti_files_backup_$(date +%Y%m%d).tar.gz /etc/cacti/* /var/lib/cacti/rra/*</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Update Cacti when new versions are available:</p>
+        <div class="command">
+          <pre><code>sudo apt update
+sudo apt upgrade cacti</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Regularly clean up old data:</p>
+        <div class="command">
+          <pre><code># Clean up old log files
+sudo find /var/log/cacti -name "*.log" -mtime +30 -delete</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+
+      <div class="tutorial-nav">
+        <a href="web-server.html"><i class="fas fa-arrow-left"></i> Previous: Web Server</a>
+        <a href="lancache-server.html">Next: Lancache Server <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </main>
+  </div>
+
+  <div class="success-message" id="copy-success">
+    <i class="fas fa-check-circle"></i> Command copied to clipboard!
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Copy to clipboard functionality
+    document.querySelectorAll('.command-copy').forEach(button => {
+      button.addEventListener('click', function() {
+        const code = this.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          const successMsg = document.getElementById('copy-success');
+          successMsg.style.display = 'block';
+          setTimeout(() => {
+            successMsg.style.display = 'none';
+          }, 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

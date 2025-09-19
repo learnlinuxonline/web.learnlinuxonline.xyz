@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+      --border: #cbd5e1;
+      --accent: #f59e0b;
+      --success: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: var(--text); background: var(--light-gray); }
+    header { background: var(--light); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: sticky; top: 0; z-index: 100; }
+    .logo { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+    nav { display: flex; gap: 1.5rem; }
+    nav a { color: var(--text); text-decoration: none; font-weight: 500; padding: 0.5rem 0; position: relative; transition: color 0.3s; }
+    nav a:hover { color: var(--primary); }
+    nav a.active { color: var(--primary); }
+    nav a.active::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--primary); border-radius: 3px; }
+    .breadcrumb { max-width: 1200px; margin: 1rem auto 0; padding: 0 1.5rem; font-size: 0.9rem; color: var(--dark-gray); }
+    .breadcrumb a { color: var(--primary); text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .about-content { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
+    .profile-section { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 3rem; }
+    .profile-image { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); margin-bottom: 1.5rem; box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); }
+    .profile-name { font-size: 2.5rem; color: var(--primary); margin-bottom: 0.5rem; }
+    .profile-title { font-size: 1.2rem; color: var(--dark-gray); margin-bottom: 1.5rem; }
+    .social-links { display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .social-link { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: white; text-decoration: none; transition: all 0.3s; }
+    .social-link:hover { background: var(--primary-light); transform: translateY(-3px); }
+    .about-text, .qualifications, .certifications, .skills, .contact { background: var(--light); padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); margin-bottom: 3rem; }
+    .about-text h2, .qualifications h2, .certifications h2, .skills h2, .contact h2 { color: var(--primary); margin-bottom: 1.5rem; font-size: 1.8rem; }
+    .qualification-item { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--medium-gray); }
+    .qualification-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .qualification-title { font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
+    .qualification-details { color: var(--dark-gray); margin-bottom: 0.5rem; }
+    .qualification-date { color: var(--primary); font-size: 0.9rem; }
+    .certification-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+    .certification-card { background: var(--light-gray); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--primary); text-align: center; }
+    .certification-card img { width: 100%; max-width: 200px; border-radius: 8px; cursor: pointer; margin-bottom: 1rem; }
+    .certification-name { font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem; }
+    .certification-org { color: var(--dark-gray); margin-bottom: 0.5rem; }
+    .certification-date { color: var(--primary); font-size: 0.9rem; }
+    footer { background: var(--light); text-align: center; padding: 1.5rem; margin-top: 3rem; border-top: 1px solid var(--medium-gray); color: var(--dark-gray); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html" class="active">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; About
+  </div>
+
+  <div class="about-content">
+    <!-- Profile Section -->
+    <section class="profile-section">
+      <img src="photo.jpg" alt="Mohammad Ali" class="profile-image">
+      <h1 class="profile-name">Mohammad Ali</h1>
+      <p class="profile-title">Linux System Administrator</p>
+      <div class="social-links">
+        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+      </div>
+    </section>
+
+    <!-- About Text Section -->
+    <section class="about-text">
+      <h2>About Me</h2>
+      <p>Hello! I'm Mohammad Ali, a passionate Linux System Administrator Loves to work and duing patrice on linux platform. I specialize in designing, implementing, and maintaining robust server infrastructure and cloud solutions.</p>
+      <p>With several years of experience in the field, I've developed expertise in various Linux distributions, server configurations, and automation tools. My goal is to share my knowledge through practical tutorials and guides that help others master Linux server administration.</p>
+      <p>I believe in learning by doing, which is why all the tutorials on LearnLinuxOnline are hands-on and practical. Whether you're a beginner looking to set up your first web server or an experienced administrator working on complex cluster configurations, you'll find valuable resources here.</p>
+    </section>
+
+    <!-- Qualifications Section -->
+    <section class="qualifications">
+      <h2>Education & Qualifications</h2>
+      <div class="qualification-item">
+        <h3 class="qualification-title">Bachelor of Science in Computer Science and Engineering</h3>
+        <p class="qualification-details">Comprehensive study of computer systems, algorithms, data structures, and software engineering principles.</p>
+        <p class="qualification-date">Year of Completion: 2017</p>
+      </div>
+      <div class="qualification-item">
+        <h3 class="qualification-title">Advanced Course on DNS Mail Zimbra Administration</h3>
+        <p class="qualification-details">Specialized training in email systems administration using Zimbra, including DNS configuration for mail services. <strong>Completed 30 hrs course</strong></p>
+      </div>
+      <div class="qualification-item">
+        <h3 class="qualification-title">Network Monitoring Toolkit with Linux</h3>
+        <p class="qualification-details">Advanced training in implementing network monitoring solutions using open-source tools on Linux platforms. <strong>Completed 30 hrs course</strong></p>
+      </div>
+    </section>
+
+    <!-- Certifications Section -->
+    <section class="certifications">
+      <h2>Professional Certifications</h2>
+      <div class="certification-grid">
+        <div class="certification-card">
+          <a href="rhcsa.jpg" target="_blank"><img src="rhcsa.jpg" alt="RHCSA"></a>
+          <h3 class="certification-name">RHCSA (Red Hat Certified System Administrator)</h3>
+          <p class="certification-org">Red Hat</p>
+          <p class="certification-date">Earned: 2017</p>
+        </div>
+        <div class="certification-card">
+          <a href="rhce.jpg" target="_blank"><img src="rhce.jpg" alt="RHCE"></a>
+          <h3 class="certification-name">RHCE (Red Hat Certified Engineer)</h3>
+          <p class="certification-org">Red Hat</p>
+          <p class="certification-date">Earned: 2019</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="skills">
+      <h2>Technical Skills</h2>
+      <div class="skills-grid">
+        <div class="skill-category">
+          <h3>Linux Administration</h3>
+          <ul class="skill-list">
+            <li>Red Hat Enterprise Linux</li>
+            <li>Ubuntu Server</li>
+            <li>CentOS/Rocky Linux</li>
+            <li>Shell Scripting</li>
+            <li>Systemd Services</li>
+          </ul>
+        </div>
+        <div class="skill-category">
+          <h3>Server Technologies</h3>
+          <ul class="skill-list">
+            <li>Apache & Nginx Web Servers</li>
+            <li>Database Servers (MySQL, PostgreSQL, MongoDB)</li>
+            <li>DNS (Bind9)</li>
+            <li>Email Systems (Zimbra, Postfix)</li>
+            <li>File Sharing (Samba, NFS)</li>
+          </ul>
+        </div>
+        <div class="skill-category">
+          <h3>Networking & Security</h3>
+          <ul class="skill-list">
+            <li>Firewall Configuration (iptables, firewalld)</li>
+            <li>VPN Implementation (OpenVPN, WireGuard)</li>
+            <li>Network Monitoring (Nagios, Zabbix, Cacti)</li>
+            <li>SSL/TLS Certificate Management</li>
+            <li>Network Troubleshooting</li>
+          </ul>
+        </div>
+        <div class="skill-category">
+          <h3>DevOps & Automation</h3>
+          <ul class="skill-list">
+            <li>Ansible Configuration Management</li>
+            <li>Docker Containerization</li>
+            <li>Kubernetes Orchestration</li>
+            <li>CI/CD Pipelines</li>
+            <li>Infrastructure as Code</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact">
+      <h2>Get In Touch</h2>
+      <p>Have questions about Linux server administration or interested in collaboration? I'd love to hear from you!</p>
+      <a href="contact.html" class="contact-btn">Contact Me</a>
+    </section>
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+</body>
+</html>

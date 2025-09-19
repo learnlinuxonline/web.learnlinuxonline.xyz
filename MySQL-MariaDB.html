@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MySQL/MariaDB Server Setup - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Improved Light Color Scheme and Typography */
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+      --border: #cbd5e1;
+      --accent: #f59e0b;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--light-gray);
+    }
+    
+    /* Header Styles */
+    header {
+      background: var(--light);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s;
+    }
+    
+    nav a:hover {
+      color: var(--primary);
+    }
+    
+    nav a.active {
+      color: var(--primary);
+    }
+    
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 1200px;
+      margin: 1rem auto 0;
+      padding: 0 1.5rem;
+      font-size: 0.9rem;
+      color: var(--dark-gray);
+    }
+    
+    .breadcrumb a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Main Content Layout */
+    .project-content {
+      max-width: 1200px;
+      margin: 1rem auto 2rem;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      gap: 2rem;
+    }
+    
+    /* Sidebar Navigation */
+    .project-nav {
+      background: var(--light);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      height: fit-content;
+      position: sticky;
+      top: 90px;
+    }
+    
+    .project-nav h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid var(--medium-gray);
+      font-size: 1.3rem;
+    }
+    
+    .project-nav ul {
+      list-style: none;
+    }
+    
+    .project-nav li {
+      margin: 0.8rem 0;
+    }
+    
+    .project-nav a {
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.7rem;
+      border-radius: 8px;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    
+    .project-nav a:hover {
+      background: var(--primary-light);
+      color: white;
+    }
+    
+    .project-nav a.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Main Content Area */
+    .project-details {
+      background: var(--light);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    .project-details h2 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+    
+    .project-details p {
+      margin-bottom: 1.5rem;
+      line-height: 1.7;
+    }
+    
+    /* Section Styles */
+    .prerequisites {
+      background: var(--light-gray);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .prerequisites h3 {
+      color: var(--primary);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+    
+    .prerequisites ul {
+      padding-left: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    .prerequisites li {
+      margin-bottom: 0.5rem;
+    }
+    
+    .step-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .step-section h3 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .step-section h3 .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      margin-right: 0.5rem;
+    }
+    
+    /* Code Blocks */
+    pre {
+      background: var(--light-gray);
+      padding: 1.2rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      border: 1px solid var(--medium-gray);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    code {
+      color: var(--secondary);
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.95rem;
+    }
+    
+    /* Note Box */
+    .note {
+      background: #fffbeb;
+      padding: 1.2rem;
+      border-radius: 8px;
+      margin: 1.2rem 0;
+      border-left: 4px solid var(--accent);
+    }
+    
+    .note strong {
+      color: var(--accent);
+    }
+    
+    /* Footer */
+    footer {
+      background: var(--light);
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 3rem;
+      border-top: 1px solid var(--medium-gray);
+      color: var(--dark-gray);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 900px) {
+      .project-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .project-nav {
+        position: static;
+        margin-bottom: 1.5rem;
+      }
+      
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+      }
+      
+      nav {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      .project-content {
+        padding: 0 1rem;
+      }
+      
+      .project-details, .project-nav {
+        padding: 1.2rem;
+      }
+      
+      .project-details h2 {
+        font-size: 1.5rem;
+      }
+    }
+    
+    /* Additional Styling */
+    .command {
+      position: relative;
+    }
+    
+    .command-copy {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: var(--primary-light);
+      color: white;
+      border: none;
+      padding: 0.3rem 0.7rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.3s;
+    }
+    
+    .command-copy:hover {
+      background: var(--primary);
+    }
+    
+    .success-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--success);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+      z-index: 1000;
+    }
+    
+    /* Tutorial navigation */
+    .tutorial-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--medium-gray);
+    }
+    
+    .tutorial-nav a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tutorial-nav a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Tabs for Ubuntu/RedHat */
+    .tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .tab {
+      padding: 0.8rem 1.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; MySQL/MariaDB Server Setup
+  </div>
+
+  <div class="project-content">
+    <aside class="project-nav">
+      <h3>Server Projects</h3>
+      <ul>
+        <li><a href="dns-server.html"><i class="fas fa-network-wired"></i> DNS Server on Ubuntu</a></li>
+        <li><a href="web-server.html"><i class="fas fa-server"></i> Web Server</a></li>
+        <li><a href="mysql-server.html" class="active"><i class="fas fa-database"></i> MySQL/MariaDB Server</a></li>
+        <li><a href="cacti-monitoring.html"><i class="fas fa-chart-line"></i> Cacti Monitoring</a></li>
+        <li><a href="lancache-server.html"><i class="fas fa-database"></i> Lancache Server</a></li>
+        <li><a href="issabel-pbx.html"><i class="fas fa-phone-alt"></i> Issabel PBX</a></li>
+        <li><a href="tv-server-flussonic.html"><i class="fas fa-tv"></i> TV Server with Flussonic</a></li>
+        <li><a href="xstream-server.html"><i class="fas fa-stream"></i> XStream Server</a></li>
+        <li><a href="virtualmin-roundcube.html"><i class="fas fa-envelope"></i> Virtualmin + Roundcube</a></li>
+        <li><a href="radarr-sonarr-bazarr.html"><i class="fas fa-film"></i> Radarr, Sonarr, Bazarr</a></li>
+        <li><a href="prowlarr.html"><i class="fas fa-search"></i> Prowlarr</a></li>
+        <li><a href="qbittorrent.html"><i class="fas fa-download"></i> qBittorrent</a></li>
+        <li><a href="ansible-automation.html"><i class="fas fa-cogs"></i> Ansible Automation</a></li>
+        <li><a href="docker-kubernetes.html"><i class="fab fa-docker"></i> Docker & Kubernetes</a></li>
+        <li><a href="wireguard-vpn.html"><i class="fas fa-shield-alt"></i> WireGuard VPN</a></li>
+        <li><a href="proxmox-ve.html"><i class="fas fa-cloud"></i> Proxmox VE</a></li>
+      </ul>
+    </aside>
+
+    <main class="project-details">
+      <h2>MySQL/MariaDB Server Setup on Linux</h2>
+      <p>MySQL and MariaDB are popular open-source relational database management systems. This tutorial covers installing and configuring both database servers on Ubuntu and RedHat-based systems.</p>
+      
+      <div class="prerequisites">
+        <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+        <ul>
+          <li>Ubuntu 20.04/22.04 LTS or RHEL/Rocky Linux 8/9</li>
+          <li>Root or sudo privileges</li>
+          <li>Minimum 1GB RAM (2GB+ recommended for production)</li>
+          <li>At least 10GB of free disk space</li>
+          <li>Basic knowledge of Linux command line</li>
+        </ul>
+      </div>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="ubuntu">Ubuntu/Debian</div>
+        <div class="tab" data-tab="redhat">RedHat/CentOS</div>
+      </div>
+      
+      <div class="tab-content active" id="ubuntu-content">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Update System and Install MySQL/MariaDB</h3>
+          <p>Update your package list and install the database server:</p>
+          <div class="command">
+            <pre><code>sudo apt update
+sudo apt upgrade -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Install MySQL Server:</p>
+          <div class="command">
+            <pre><code>sudo apt install mysql-server -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Or install MariaDB Server:</p>
+          <div class="command">
+            <pre><code>sudo apt install mariadb-server -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">2</span> Start and Enable the Service</h3>
+          <p>Start the database service and enable it to start on boot:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo systemctl start mysql
+sudo systemctl enable mysql
+
+# For MariaDB
+sudo systemctl start mariadb
+sudo systemctl enable mariadb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Check the service status:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo systemctl status mysql
+
+# For MariaDB
+sudo systemctl status mariadb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">3</span> Run Security Script</h3>
+          <p>MySQL and MariaDB include a security script to secure your installation:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo mysql_secure_installation
+
+# For MariaDB
+sudo mariadb-secure-installation</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Follow the prompts to:</p>
+          <ul>
+            <li>Set a root password (if not set)</li>
+            <li>Remove anonymous users</li>
+            <li>Disallow remote root login</li>
+            <li>Remove test database</li>
+            <li>Reload privilege tables</li>
+          </ul>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">4</span> Configure MySQL/MariaDB</h3>
+          <p>Edit the main configuration file:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# For MariaDB
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Make basic configuration changes (adjust based on your server resources):</p>
+          <div class="command">
+            <pre><code>[mysqld]
+# Basic settings
+bind-address = 0.0.0.0  # Change to 127.0.0.1 for local only
+max_connections = 100
+wait_timeout = 600
+
+# Memory settings
+key_buffer_size = 256M
+max_allowed_packet = 256M
+thread_stack = 192K
+thread_cache_size = 8
+
+# InnoDB settings (if using InnoDB)
+innodb_buffer_pool_size = 512M
+innodb_log_file_size = 128M
+innodb_flush_log_at_trx_commit = 2</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Restart the service to apply changes:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo systemctl restart mysql
+
+# For MariaDB
+sudo systemctl restart mariadb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">5</span> Create Database and User</h3>
+          <p>Access the MySQL/MariaDB shell:</p>
+          <div class="command">
+            <pre><code>sudo mysql -u root -p</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Once in the MySQL shell, create a new database and user:</p>
+          <div class="command">
+            <pre><code>-- Create a new database
+CREATE DATABASE example_db;
+
+-- Create a new user
+CREATE USER 'example_user'@'localhost' IDENTIFIED BY 'strong_password';
+
+-- Grant privileges to the user on the database
+GRANT ALL PRIVILEGES ON example_db.* TO 'example_user'@'localhost';
+
+-- Apply privilege changes
+FLUSH PRIVILEGES;
+
+-- Exit the MySQL shell
+EXIT;</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">6</span> Test the Database Connection</h3>
+          <p>Test your connection with the new user:</p>
+          <div class="command">
+            <pre><code>mysql -u example_user -p -D example_db</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Create a simple test table:</p>
+          <div class="command">
+            <pre><code>CREATE TABLE test_table (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO test_table (name) VALUES ('Test Record');
+
+SELECT * FROM test_table;</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">7</span> Configure Firewall (If Enabled)</h3>
+          <p>Allow MySQL/MariaDB through the firewall (default port 3306):</p>
+          <div class="command">
+            <pre><code>sudo ufw allow 3306/tcp
+sudo ufw enable
+sudo ufw status</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note">
+            <strong>Security Note:</strong> Only open port 3306 to trusted IP addresses in production environments. Consider using SSH tunneling for remote access instead.
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">8</span> Backup and Maintenance</h3>
+          <p>Create a basic backup script:</p>
+          <div class="command">
+            <pre><code>sudo nano /usr/local/bin/mysql-backup.sh</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Add the following content (adjust paths and credentials):</p>
+          <div class="command">
+            <pre><code>#!/bin/bash
+# MySQL/MariaDB backup script
+DATE=$(date +%Y-%m-%d_%H-%M-%S)
+BACKUP_DIR="/backup/mysql"
+MYSQL_USER="backup_user"
+MYSQL_PASSWORD="backup_password"
+
+# Create backup directory if it doesn't exist
+mkdir -p $BACKUP_DIR
+
+# Get list of databases
+DATABASES=$(mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e "SHOW DATABASES;" | grep -Ev "(Database|information_schema|performance_schema|sys)")
+
+# Backup each database
+for DB in $DATABASES; do
+    mysqldump -u$MYSQL_USER -p$MYSQL_PASSWORD --single-transaction --routines --triggers $DB | gzip > "$BACKUP_DIR/$DB-$DATE.sql.gz"
+done
+
+# Delete backups older than 30 days
+find $BACKUP_DIR -type f -name "*.sql.gz" -mtime +30 -delete</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Make the script executable:</p>
+          <div class="command">
+            <pre><code>sudo chmod +x /usr/local/bin/mysql-backup.sh</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="redhat-content">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Update System and Install MySQL/MariaDB</h3>
+          <p>Update your package list and install the database server:</p>
+          <div class="command">
+            <pre><code># For RHEL 8/9, Rocky Linux, AlmaLinux
+sudo dnf update -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Enable the MySQL or MariaDB repository and install:</p>
+          <div class="command">
+            <pre><code># For MySQL on RHEL 8/9
+sudo dnf install mysql-server -y
+
+# For MariaDB on RHEL 8/9
+sudo dnf install mariadb-server -y
+
+# For CentOS 7
+sudo yum install mariadb-server -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">2</span> Start and Enable the Service</h3>
+          <p>Start the database service and enable it to start on boot:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo systemctl start mysqld
+sudo systemctl enable mysqld
+
+# For MariaDB
+sudo systemctl start mariadb
+sudo systemctl enable mariadb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Check the service status:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo systemctl status mysqld
+
+# For MariaDB
+sudo systemctl status mariadb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">3</span> Run Security Script</h3>
+          <p>MySQL and MariaDB include a security script to secure your installation:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo mysql_secure_installation
+
+# For MariaDB
+sudo mariadb-secure-installation</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Follow the prompts to:</p>
+          <ul>
+            <li>Set a root password (if not set)</li>
+            <li>Remove anonymous users</li>
+            <li>Disallow remote root login</li>
+            <li>Remove test database</li>
+            <li>Reload privilege tables</li>
+          </ul>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">4</span> Configure MySQL/MariaDB</h3>
+          <p>Edit the main configuration file:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo nano /etc/my.cnf.d/mysql-server.cnf
+
+# For MariaDB
+sudo nano /etc/my.cnf.d/mariadb-server.cnf</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Make basic configuration changes (adjust based on your server resources):</p>
+          <div class="command">
+            <pre><code>[mysqld]
+# Basic settings
+bind-address = 0.0.0.0  # Change to 127.0.0.1 for local only
+max_connections = 100
+wait_timeout = 600
+
+# Memory settings
+key_buffer_size = 256M
+max_allowed_packet = 256M
+thread_stack = 192K
+thread_cache_size = 8
+
+# InnoDB settings (if using InnoDB)
+innodb_buffer_pool_size = 512M
+innodb_log_file_size = 128M
+innodb_flush_log_at_trx_commit = 2
+
+# For RHEL-based systems, add this line to avoid socket issues
+socket = /var/lib/mysql/mysql.sock</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Restart the service to apply changes:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo systemctl restart mysqld
+
+# For MariaDB
+sudo systemctl restart mariadb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">5</span> Create Database and User</h3>
+          <p>Access the MySQL/MariaDB shell:</p>
+          <div class="command">
+            <pre><code>sudo mysql -u root -p</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Once in the MySQL shell, create a new database and user:</p>
+          <div class="command">
+            <pre><code>-- Create a new database
+CREATE DATABASE example_db;
+
+-- Create a new user
+CREATE USER 'example_user'@'localhost' IDENTIFIED BY 'strong_password';
+
+-- Grant privileges to the user on the database
+GRANT ALL PRIVILEGES ON example_db.* TO 'example_user'@'localhost';
+
+-- Apply privilege changes
+FLUSH PRIVILEGES;
+
+-- Exit the MySQL shell
+EXIT;</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">6</span> Configure SELinux and Firewall</h3>
+          <p>If SELinux is enabled, configure it for MySQL/MariaDB:</p>
+          <div class="command">
+            <pre><code># Check SELinux status
+sestatus
+
+# If enforcing, set the appropriate context for database files
+sudo semanage fcontext -a -t mysqld_db_t "/var/lib/mysql(/.*)?"
+sudo restorecon -Rv /var/lib/mysql</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Configure the firewall to allow MySQL connections:</p>
+          <div class="command">
+            <pre><code># For firewalld
+sudo firewall-cmd --permanent --add-service=mysql
+sudo firewall-cmd --reload
+
+# For older systems with iptables
+sudo iptables -A INPUT -p tcp --dport 3306 -j ACCEPT
+sudo service iptables save</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note">
+            <strong>Security Note:</strong> Only open port 3306 to trusted IP addresses in production environments. Consider using SSH tunneling for remote access instead.
+          </div>
+        </div>
+        
+        <div class="step-section">
+          <h3><span class="step-number">7</span> Troubleshooting Common Issues</h3>
+          <p>Check error logs if you encounter issues:</p>
+          <div class="command">
+            <pre><code># For MySQL
+sudo tail -f /var/log/mysqld.log
+
+# For MariaDB
+sudo tail -f /var/log/mariadb/mariadb.log</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>If you can't connect to the database server, check the bind address:</p>
+          <div class="command">
+            <pre><code># Check if MySQL is listening on the correct interface
+sudo netstat -tlnp | grep mysql</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Reset root password if forgotten:</p>
+          <div class="command">
+            <pre><code># Stop MySQL/MariaDB
+sudo systemctl stop mysqld  # or mariadb
+
+# Start without password checking
+sudo mysqld_safe --skip-grant-tables &
+
+# Connect to MySQL
+mysql -u root
+
+# Update root password
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
+EXIT;
+
+# Restart normally
+sudo systemctl start mysqld  # or mariadb</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tutorial-nav">
+        <a href="web-server.html"><i class="fas fa-arrow-left"></i> Previous: Web Server</a>
+        <a href="cacti-monitoring.html">Next: Cacti Monitoring <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </main>
+  </div>
+
+  <div class="success-message" id="copy-success">
+    <i class="fas fa-check-circle"></i> Command copied to clipboard!
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Tab functionality
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Show the selected tab content
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(`${tabId}-content`).classList.add('active');
+      });
+    });
+
+    // Copy to clipboard functionality
+    document.querySelectorAll('.command-copy').forEach(button => {
+      button.addEventListener('click', function() {
+        const code = this.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          const successMsg = document.getElementById('copy-success');
+          successMsg.style.display = 'block';
+          setTimeout(() => {
+            successMsg.style.display = 'none';
+          }, 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

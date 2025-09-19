@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samba File Server - LearnLinuxOnline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --text: #334155;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+        }
+        
+        header {
+            background: var(--light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a.active {
+            color: var(--primary);
+        }
+        
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .breadcrumb {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .project-content {
+            max-width: 1200px;
+            margin: 1rem auto 2rem;
+            padding: 0 1.5rem;
+        }
+        
+        .project-details {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .project-details h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .project-details p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .prerequisites {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .prerequisites h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .prerequisites ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+        
+        .prerequisites li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .step-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-section h3 .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        
+        pre {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            border: 1px solid var(--medium-gray);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        code {
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .note {
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .note strong {
+            color: var(--accent);
+        }
+        
+        .warning {
+            background: #fef2f2;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .warning strong {
+            color: #ef4444;
+        }
+        
+        .info {
+            background: #eff6ff;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info strong {
+            color: var(--primary);
+        }
+        
+        footer {
+            background: var(--light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            nav {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .project-content {
+                padding: 0 1rem;
+            }
+            
+            .project-details {
+                padding: 1.2rem;
+            }
+            
+            .project-details h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .command {
+            position: relative;
+        }
+        
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .command-copy:hover {
+            background: var(--primary);
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .tutorial-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .tutorial-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tutorial-nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .config-table th, .config-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .config-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        .config-table tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LearnLinuxOnline</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="courses.html">Courses</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &raquo; Samba File Server on Ubuntu 22.04
+    </div>
+
+    <div class="project-content">
+        <main class="project-details">
+            <h2>Samba File Server Setup on Ubuntu 22.04 LTS</h2>
+            <p>Samba is an open-source software suite that provides seamless file and print services to SMB/CIFS clients. It allows Linux machines to act as file servers that can be accessed by Windows, macOS, and other Linux machines on the network.</p>
+            
+            <div class="prerequisites">
+                <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+                <ul>
+                    <li>Ubuntu 22.04 LTS server</li>
+                    <li>Minimum 2GB RAM (4GB recommended for large deployments)</li>
+                    <li>Sufficient disk space for your file storage needs</li>
+                    <li>Root or sudo privileges</li>
+                    <li>Static IP address configured</li>
+                    <li>Basic knowledge of Linux command line</li>
+                </ul>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">1</span> System Preparation</h3>
+                <p>Update your system and set the hostname:</p>
+                <div class="command">
+                    <pre><code>sudo apt update && sudo apt upgrade -y
+sudo hostnamectl set-hostname samba-server
+exec bash</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Install necessary utilities:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y wget curl nano</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">2</span> Install Samba</h3>
+                <p>Install the Samba package:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y samba</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check if Samba is running:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status smbd nmbd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Enable Samba to start on boot:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl enable smbd nmbd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">3</span> Configure Firewall</h3>
+                <p>Allow Samba through the firewall:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow samba
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Alternatively, open specific ports manually:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow 139/tcp
+sudo ufw allow 445/tcp
+sudo ufw allow 137/udp
+sudo ufw allow 138/udp
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the firewall status:</p>
+                <div class="command">
+                    <pre><code>sudo ufw status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">4</span> Create Shared Directory</h3>
+                <p>Create a directory for sharing:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /samba/shared</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Set appropriate permissions:</p>
+                <div class="command">
+                    <pre><code>sudo chmod -R 0777 /samba/shared
+sudo chown -R nobody:nogroup /samba/shared</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <div class="note">
+                    <strong>Note:</strong> These permissions allow anyone to read and write to the share. For more secure configurations, see the advanced section.
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">5</span> Configure Samba Shares</h3>
+                <p>Back up the original Samba configuration file:</p>
+                <div class="command">
+                    <pre><code>sudo cp /etc/samba/smb.conf /etc/samba/smb.conf.backup</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Edit the Samba configuration file:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/samba/smb.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add the following share configuration at the end of the file:</p>
+                <div class="command">
+                    <pre><code>[shared]
+    comment = Ubuntu File Server Share
+    path = /samba/shared
+    browsable = yes
+    read only = no
+    guest ok = yes
+    create mask = 0777
+    directory mask = 0777</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test the Samba configuration for errors:</p>
+                <div class="command">
+                    <pre><code>testparm</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Restart Samba to apply changes:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart smbd nmbd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">6</span> Create Secure Share with User Authentication</h3>
+                <p>Create a secure directory:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /samba/secure</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create a Samba user:</p>
+                <div class="command">
+                    <pre><code>sudo useradd sambauser
+sudo smbpasswd -a sambauser</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Set directory permissions:</p>
+                <div class="command">
+                    <pre><code>sudo chown -R sambauser:sambauser /samba/secure
+sudo chmod -R 0770 /samba/secure</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add the secure share to the Samba configuration:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/samba/smb.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add the following configuration:</p>
+                <div class="command">
+                    <pre><code>[secure]
+    comment = Secure File Server Share
+    path = /samba/secure
+    valid users = sambauser
+    browsable = yes
+    read only = no
+    guest ok = no
+    create mask = 0770
+    directory mask = 0770</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Restart Samba to apply changes:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart smbd nmbd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">7</span> Access Samba Shares from Clients</h3>
+                <p>From Windows:</p>
+                <ol>
+                    <li>Open File Explorer</li>
+                    <li>In the address bar, type: <code>\\samba-server-ip\shared</code></li>
+                    <li>For secure share: <code>\\samba-server-ip\secure</code></li>
+                    <li>Enter credentials when prompted (for secure share)</li>
+                </ol>
+                <p>From Linux:</p>
+                <div class="command">
+                    <pre><code># Install Samba client if needed
+sudo apt install -y smbclient cifs-utils
+
+# List available shares
+smbclient -L //samba-server-ip -U%
+
+# Connect to a share
+smbclient //samba-server-ip/shared -U username</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Mount Samba share permanently:</p>
+                <div class="command">
+                    <pre><code># Create mount point
+sudo mkdir /mnt/samba-share
+
+# Add to /etc/fstab
+//samba-server-ip/shared /mnt/samba-share cifs username=sambauser,password=yourpassword,uid=1000,gid=1000 0 0
+
+# Mount the share
+sudo mount -a</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">8</span> Advanced Configuration Options</h3>
+                <p>Configure Samba as a Domain Member:</p>
+                <div class="command">
+                    <pre><code># Install required packages
+sudo apt install -y winbind krb5-user
+
+# Join domain (replace with your domain details)
+sudo net ads join -U administrator</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure Samba as a Domain Controller:</p>
+                <div class="command">
+                    <pre><code># Install Samba domain controller packages
+sudo apt install -y samba-dsdb-modules samba-vfs-modules
+
+# Configure as AD DC
+sudo samba-tool domain provision --use-rfc2307 --interactive</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Enable Samba recycle bin functionality:</p>
+                <div class="command">
+                    <pre><code>[shared]
+    vfs objects = recycle
+    recycle:repository = .recycle/%U
+    recycle:keeptree = yes
+    recycle:versions = yes
+    recycle:maxsize = 0
+    recycle:exclude = *.tmp,*.temp,*.o,*.obj
+    recycle:noversions = *.doc,*.xls,*.ppt</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">9</span> User and Group Management</h3>
+                <p>Create multiple Samba users:</p>
+                <div class="command">
+                    <pre><code># Create system user
+sudo useradd -m -s /bin/bash user1
+sudo useradd -m -s /bin/bash user2
+
+# Set Samba passwords
+sudo smbpasswd -a user1
+sudo smbpasswd -a user2</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create a group for shared access:</p>
+                <div class="command">
+                    <pre><code>sudo groupadd smbgroup
+sudo usermod -aG smbgroup user1
+sudo usermod -aG smbgroup user2
+
+# Set group ownership on directory
+sudo chgrp -R smbgroup /samba/group-share
+sudo chmod -R 0770 /samba/group-share</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure group-based share:</p>
+                <div class="command">
+                    <pre><code>[group-share]
+    comment = Group File Share
+    path = /samba/group-share
+    valid users = @smbgroup
+    browsable = yes
+    read only = no
+    guest ok = no
+    create mask = 0770
+    directory mask = 0770
+    force group = smbgroup</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">10</span> Troubleshooting Common Issues</h3>
+                <p>Check Samba service status:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status smbd nmbd
+sudo journalctl -u smbd -f</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check Samba logs:</p>
+                <div class="command">
+                    <pre><code>tail -f /var/log/samba/log.smbd
+tail -f /var/log/samba/log.nmbd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test Samba configuration:</p>
+                <div class="command">
+                    <pre><code>testparm -s</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check network connectivity:</p>
+                <div class="command">
+                    <pre><code>smbclient -L localhost -U%</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common issues and solutions:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Permission denied errors</td>
+                        <td>Check directory permissions and SELinux/AppArmor settings</td>
+                    </tr>
+                    <tr>
+                        <td>Cannot access share from Windows</td>
+                        <td>Check firewall settings and SMB protocol version</td>
+                    </tr>
+                    <tr>
+                        <td>Authentication failures</td>
+                        <td>Verify user exists in Samba database with smbpasswd</td>
+                    </tr>
+                    <tr>
+                        <td>Slow file transfers</td>
+                        <td>Adjust socket options in smb.conf</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tutorial-nav">
+                <a href="freeipa-auth.html"><i class="fas fa-arrow-left"></i> Previous: FreeIPA Auth</a>
+                <a href="nfs-server.html">Next: NFS Server <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <div class="success-message" id="copy-success">
+        <i class="fas fa-check-circle"></i> Command copied to clipboard!
+    </div>
+
+    <footer>
+        <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.command-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.previousElementSibling.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const successMsg = document.getElementById('copy-success');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

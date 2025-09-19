@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTP Server with vsftpd - LearnLinuxOnline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --text: #334155;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+        }
+        
+        header {
+            background: var(--light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a.active {
+            color: var(--primary);
+        }
+        
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .breadcrumb {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .project-content {
+            max-width: 1200px;
+            margin: 1rem auto 2rem;
+            padding: 0 1.5rem;
+        }
+        
+        .project-details {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .project-details h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .project-details p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .prerequisites {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .prerequisites h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .prerequisites ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+        
+        .prerequisites li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .step-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-section h3 .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        
+        pre {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            border: 1px solid var(--medium-gray);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        code {
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .note {
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .note strong {
+            color: var(--accent);
+        }
+        
+        .warning {
+            background: #fef2f2;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .warning strong {
+            color: #ef4444;
+        }
+        
+        .info {
+            background: #eff6ff;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info strong {
+            color: var(--primary);
+        }
+        
+        footer {
+            background: var(--light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            nav {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .project-content {
+                padding: 0 1rem;
+            }
+            
+            .project-details {
+                padding: 1.2rem;
+            }
+            
+            .project-details h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .command {
+            position: relative;
+        }
+        
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .command-copy:hover {
+            background: var(--primary);
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .tutorial-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .tutorial-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tutorial-nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .config-table th, .config-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .config-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        .config-table tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LearnLinuxOnline</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="courses.html">Courses</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &raquo; FTP Server with vsftpd
+    </div>
+
+    <div class="project-content">
+        <main class="project-details">
+            <h2>FTP Server with vsftpd on Ubuntu 22.04 LTS</h2>
+            <p>vsftpd (Very Secure FTP Daemon) is a lightweight, stable and secure FTP server for Unix-like systems. It's designed with security in mind and is the default FTP server for many Linux distributions including Ubuntu.</p>
+            
+            <div class="prerequisites">
+                <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+                <ul>
+                    <li>Ubuntu 22.04 LTS server</li>
+                    <li>Minimum 1GB RAM (2GB recommended)</li>
+                    <li>Sufficient disk space for your FTP storage needs</li>
+                    <li>Root or sudo privileges</li>
+                    <li>Static IP address configured</li>
+                    <li>Basic knowledge of Linux command line</li>
+                </ul>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">1</span> System Preparation</h3>
+                <p>Update your system and set the hostname:</p>
+                <div class="command">
+                    <pre><code>sudo apt update && sudo apt upgrade -y
+sudo hostnamectl set-hostname ftp-server
+exec bash</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Install necessary utilities:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y wget curl nano ufw</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">2</span> Install vsftpd</h3>
+                <p>Install the vsftpd package:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y vsftpd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check if vsftpd is running:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status vsftpd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Enable vsftpd to start on boot:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl enable vsftpd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">3</span> Configure Firewall</h3>
+                <p>Allow FTP through the firewall:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow 20/tcp
+sudo ufw allow 21/tcp
+sudo ufw allow 990/tcp
+sudo ufw allow 40000:50000/tcp
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the firewall status:</p>
+                <div class="command">
+                    <pre><code>sudo ufw status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">4</span> Create FTP Directory and User</h3>
+                <p>Create a dedicated FTP directory:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /var/ftp/pub
+sudo chown nobody:nogroup /var/ftp/pub
+sudo chmod a-w /var/ftp/pub</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create a directory for authenticated users:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /var/ftp/upload
+sudo chmod 777 /var/ftp/upload</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create an FTP user:</p>
+                <div class="command">
+                    <pre><code>sudo useradd -m ftpuser
+sudo passwd ftpuser</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create a directory for the user and set permissions:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /home/ftpuser/ftp
+sudo chown nobody:nogroup /home/ftpuser/ftp
+sudo chmod a-w /home/ftpuser/ftp
+sudo mkdir /home/ftpuser/ftp/files
+sudo chown ftpuser:ftpuser /home/ftpuser/ftp/files</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">5</span> Configure vsftpd</h3>
+                <p>Back up the original configuration file:</p>
+                <div class="command">
+                    <pre><code>sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.backup</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Edit the vsftpd configuration file:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/vsftpd.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Update the configuration with these settings:</p>
+                <div class="command">
+                    <pre><code># Allow anonymous FTP? (Beware - allowed by default if you comment this out).
+anonymous_enable=NO
+
+# Uncomment this to allow local users to log in.
+local_enable=YES
+
+# Uncomment this to enable any form of FTP write command.
+write_enable=YES
+
+# Default umask for local users is 077. You may wish to change this to 022,
+# if your users expect that (022 is used by most other ftpd's)
+local_umask=022
+
+# Uncomment this to allow the anonymous FTP user to upload files. This only
+# has an effect if the above global write enable is activated. Also, you will
+# obviously need to create a directory writable by the FTP user.
+#anon_upload_enable=YES
+
+# Uncomment this if you want the anonymous FTP user to be able to create
+# new directories.
+#anon_mkdir_write_enable=YES
+
+# Activate directory messages - messages given to remote users when they
+# go into a certain directory.
+dirmessage_enable=YES
+
+# If enabled, vsftpd will display directory listings with the time
+# in  your  local  time  zone.  The default is to display GMT. The
+# times returned by the MDTM FTP command are also affected by this
+# option.
+use_localtime=YES
+
+# Activate logging of uploads/downloads.
+xferlog_enable=YES
+
+# Make sure PORT transfer connections originate from port 20 (ftp-data).
+connect_from_port_20=YES
+
+# If you want, you can arrange for uploaded anonymous files to be owned by
+# a different user. Note! Using "root" for uploaded files is not
+# recommended!
+#chown_uploads=YES
+#chown_username=whoever
+
+# You may override where the log file goes if you like. The default is shown
+# below.
+#xferlog_file=/var/log/vsftpd.log
+
+# If you want, you can have your log file in standard ftpd xferlog format.
+# Note that the default log file location is /var/log/xferlog in this case.
+xferlog_std_format=YES
+
+# You may change the default value for timing out an idle session.
+#idle_session_timeout=600
+
+# You may change the default value for timing out a data connection.
+#data_connection_timeout=120
+
+# It is recommended that you define on your system a unique user which the
+# ftp server can use as a totally isolated and unprivileged user.
+#nopriv_user=ftpsecure
+
+# Enable this and the server will recognise asynchronous ABOR requests. Not
+# recommended for security (the code is non-trivial). Not enabling it,
+# however, may confuse older FTP clients.
+#async_abor_enable=YES
+
+# By default the server will pretend to allow ASCII mode but in fact ignore
+# the request. Turn on the below options to have the server actually do ASCII
+# mangling on files when in ASCII mode.
+# Beware that on some FTP servers, ASCII support allows a denial of service
+# attack (DoS) via the command "SIZE /big/file" in ASCII mode. vsftpd
+# predicted this attack and has always been safe, reporting the size of the
+# raw file.
+# ASCII mangling is a horrible feature of the protocol.
+#ascii_upload_enable=YES
+#ascii_download_enable=YES
+
+# You may fully customise the login banner string:
+#ftpd_banner=Welcome to blah FTP service.
+
+# You may specify an explicit list of local users to chroot() to their home
+# directory. If chroot_local_user is YES, then this list becomes a list of
+# users to NOT chroot().
+chroot_local_user=YES
+allow_writeable_chroot=YES
+
+# You may activate the "-R" option to the builtin ls. This is disabled by
+# default to avoid remote users being able to cause excessive I/O on large
+# sites. However, some broken FTP clients such as "ncftp" and "mirror" assume
+# the presence of the "-R" option.
+#ls_recurse_enable=YES
+
+# When "listen" directive is enabled, vsftpd runs in standalone mode and
+# listens on IPv4 sockets. This directive cannot be used in conjunction
+# with the listen_ipv6 directive.
+listen=YES
+
+# This directive enables listening on IPv6 sockets. To listen on IPv4 and IPv6
+# sockets, you must run two copies of vsftpd with two configuration files.
+# Make sure, that one of the listen options is commented !!
+#listen_ipv6=YES
+
+# Add these settings for passive mode
+pasv_enable=YES
+pasv_min_port=40000
+pasv_max_port=50000
+pasv_address=your_server_ip</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <div class="note">
+                    <strong>Note:</strong> Replace <code>your_server_ip</code> with your server's actual IP address.
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">6</span> Configure User Access</h3>
+                <p>Create a user list for vsftpd:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/vsftpd.user_list</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add users to allow or deny FTP access (one per line):</p>
+                <div class="command">
+                    <pre><code># Users to allow FTP access
+ftpuser
+# Users to deny FTP access
+root
+bin
+daemon
+adm
+lp
+sync
+shutdown
+halt
+mail
+news
+uucp
+operator
+games
+nobody</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure user access in the main configuration:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/vsftpd.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add these lines to the configuration:</p>
+                <div class="command">
+                    <pre><code>userlist_enable=YES
+userlist_file=/etc/vsftpd.user_list
+userlist_deny=NO</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">7</span> Enable SSL/TLS Encryption</h3>
+                <p>Generate SSL certificates for secure connections:</p>
+                <div class="command">
+                    <pre><code>sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+-keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure vsftpd to use SSL:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/vsftpd.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add these SSL configuration options:</p>
+                <div class="command">
+                    <pre><code># SSL Configuration
+rsa_cert_file=/etc/ssl/private/vsftpd.pem
+rsa_private_key_file=/etc/ssl/private/vsftpd.pem
+ssl_enable=YES
+allow_anon_ssl=NO
+force_local_data_ssl=YES
+force_local_logins_ssl=YES
+ssl_tlsv1=YES
+ssl_sslv2=NO
+ssl_sslv3=NO
+require_ssl_reuse=NO
+ssl_ciphers=HIGH</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">8</span> Restart and Test vsftpd</h3>
+                <p>Restart the vsftpd service to apply changes:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart vsftpd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check the status to ensure it's running properly:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status vsftpd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test the FTP connection from the local machine:</p>
+                <div class="command">
+                    <pre><code>ftp localhost</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test with a client like FileZilla or from the command line:</p>
+                <div class="command">
+                    <pre><code># Install FTP client if needed
+sudo apt install -y ftp
+
+# Connect to the FTP server
+ftp your_server_ip</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">9</span> Advanced Configuration Options</h3>
+                <p>Limit user upload/download rates:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/vsftpd.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add these rate limiting options:</p>
+                <div class="command">
+                    <pre><code># Limit download bandwidth (bytes per second)
+local_max_rate=1000000
+
+# Limit upload bandwidth (bytes per second)
+anon_max_rate=500000
+
+# Maximum number of clients
+max_clients=50
+
+# Maximum number of connections per IP
+max_per_ip=5</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure logging options:</p>
+                <div class="command">
+                    <pre><code># Enable detailed logging
+log_ftp_protocol=YES
+
+# Custom log file location
+vsftpd_log_file=/var/log/vsftpd.log
+
+# Enable dual log format
+dual_log_enable=YES</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Set connection timeouts:</p>
+                <div class="command">
+                    <pre><code># Idle session timeout (seconds)
+idle_session_timeout=600
+
+# Data connection timeout (seconds)
+data_connection_timeout=120
+
+# Login timeout (seconds)
+connect_timeout=60</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">10</span> Troubleshooting Common Issues</h3>
+                <p>Check vsftpd service status:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status vsftpd
+sudo journalctl -u vsftpd -f</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check vsftpd logs:</p>
+                <div class="command">
+                    <pre><code>sudo tail -f /var/log/vsftpd.log
+sudo grep vsftpd /var/log/syslog</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test FTP connectivity:</p>
+                <div class="command">
+                    <pre><code># Test from local machine
+ftp 127.0.0.1
+
+# Test from remote machine
+telnet your_server_ip 21</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common issues and solutions:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Connection refused</td>
+                        <td>Check firewall settings and vsftpd status</td>
+                    </tr>
+                    <tr>
+                        <td>Authentication failures</td>
+                        <td>Verify user exists and is in vsftpd.user_list</td>
+                    </tr>
+                    <tr>
+                        <td>Passive mode not working</td>
+                        <td>Check passive port range and firewall rules</td>
+                    </tr>
+                    <tr>
+                        <td>SSL/TLS connection errors</td>
+                        <td>Verify SSL certificate configuration</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tutorial-nav">
+                <a href="nfs-server.html"><i class="fas fa-arrow-left"></i> Previous: NFS Server</a>
+                <a href="sftp-server.html">Next: SFTP Server <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <div class="success-message" id="copy-success">
+        <i class="fas fa-check-circle"></i> Command copied to clipboard!
+    </div>
+
+    <footer>
+        <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.command-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.previousElementSibling.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const successMsg = document.getElementById('copy-success');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

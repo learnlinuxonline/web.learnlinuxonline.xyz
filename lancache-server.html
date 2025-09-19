@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lancache Server Setup & Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --text: #334155;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --facebook: #3b5998;
+            --whatsapp: #25D366;
+            --telegram: #0088cc;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav li {
+            margin-left: 1.5rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: opacity 0.3s;
+        }
+        
+        nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            background: linear-gradient(120deg, var(--primary-light), var(--primary));
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .share-buttons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            transition: transform 0.3s, opacity 0.3s;
+            cursor: pointer;
+        }
+        
+        .share-btn:hover {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+        
+        .facebook {
+            background-color: var(--facebook);
+        }
+        
+        .whatsapp {
+            background-color: var(--whatsapp);
+        }
+        
+        .telegram {
+            background-color: var(--telegram);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            gap: 2rem;
+            padding: 2rem 0;
+        }
+        
+        .sidebar {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar li {
+            margin: 0.8rem 0;
+        }
+        
+        .sidebar a {
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.7rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .sidebar a:hover {
+            background: var(--primary-light);
+            color: white;
+        }
+        
+        .content {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section {
+            margin-bottom: 3rem;
+        }
+        
+        .section h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+        
+        .prerequisites {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .prerequisites h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .prerequisites ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+        
+        .prerequisites li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .step-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .step-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        
+        pre {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            border: 1px solid var(--medium-gray);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
+        
+        code {
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .command-copy:hover {
+            background: var(--primary);
+        }
+        
+        .note {
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .note strong {
+            color: var(--accent);
+        }
+        
+        .warning {
+            background: #fef2f2;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--danger);
+        }
+        
+        .warning strong {
+            color: var(--danger);
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        footer {
+            background: var(--text-dark);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-share {
+            margin-top: 1rem;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .footer-share .share-btn {
+            position: static;
+            margin: 0 5px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+                margin-bottom: 1.5rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            nav li {
+                margin: 0 0.5rem;
+            }
+            
+            .share-buttons {
+                position: static;
+                justify-content: center;
+                margin-top: 1.5rem;
+            }
+        }
+        
+        .monitoring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .monitoring-card {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--medium-gray);
+        }
+        
+        .monitoring-card h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-up {
+            background-color: var(--success);
+        }
+        
+        .status-down {
+            background-color: var(--danger);
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: var(--primary-light);
+        }
+        
+        .btn-secondary {
+            background: var(--dark-gray);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--text);
+        }
+        
+        .floating-share {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-server"></i>Lancache Setup Guide
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#installation">Installation</a></li>
+                    <li><a href="#maintenance">Maintenance</a></li>
+                    <li><a href="#monitoring">Monitoring</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="hero">
+        <div class="container">
+            <h1>Complete Lancache Server Setup & Management</h1>
+            <p>Learn how to install, configure, maintain, and monitor a Lancache server on Ubuntu 20.04 LTS</p>
+            
+            <div class="share-buttons">
+                <div class="share-btn facebook" onclick="shareOnFacebook()">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <div class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div class="share-btn telegram" onclick="shareOnTelegram()">
+                    <i class="fab fa-telegram-plane"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-share">
+        <div class="share-btn facebook" onclick="shareOnFacebook()">
+            <i class="fab fa-facebook-f"></i>
+        </div>
+        <div class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+        </div>
+        <div class="share-btn telegram" onclick="shareOnTelegram()">
+            <i class="fab fa-telegram-plane"></i>
+        </div>
+    </div>
+
+    <div class="container main-content">
+        <aside class="sidebar">
+            <h3>Guide Contents</h3>
+            <ul>
+                <li><a href="#introduction"><i class="fas fa-info-circle"></i> Introduction</a></li>
+                <li><a href="#prerequisites"><i class="fas fa-clipboard-list"></i> Prerequisites</a></li>
+                <li><a href="#installation"><i class="fas fa-download"></i> Installation</a></li>
+                <li><a href="#configuration"><i class="fas fa-cog"></i> Configuration</a></li>
+                <li><a href="#maintenance"><i class="fas fa-tools"></i> Maintenance</a></li>
+                <li><a href="#domain-updates"><i class="fas fa-sync"></i> Domain Updates</a></li>
+                <li><a href="#monitoring"><i class="fas fa-chart-line"></i> Monitoring</a></li>
+                <li><a href="#troubleshooting"><i class="fas fa-bug"></i> Troubleshooting</a></li>
+            </ul>
+            
+            <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--medium-gray);">
+                <h3>Share This Guide</h3>
+                <div style="display: flex; gap: 10px; margin-top: 1rem;">
+                    <div class="share-btn facebook" onclick="shareOnFacebook()">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <div class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="share-btn telegram" onclick="shareOnTelegram()">
+                        <i class="fab fa-telegram-plane"></i>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <section id="introduction" class="section">
+                <h2>Introduction to Lancache</h2>
+                <p>Lancache is a caching proxy specifically designed for caching game downloads from services like Steam, Origin, Battle.net, Epic Games, and others. It can significantly reduce bandwidth usage in environments with multiple gamers.</p>
+                <p>This guide will walk you through the complete process of setting up, configuring, maintaining, and monitoring a Lancache server on Ubuntu 20.04 LTS.</p>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 10px;">
+                    <div class="share-btn facebook" onclick="shareOnFacebook()">
+                        <i class="fab fa-facebook-f"></i>
+                    </div>
+                    <div class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div class="share-btn telegram" onclick="shareOnTelegram()">
+                        <i class="fab fa-telegram-plane"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section id="prerequisites" class="section">
+                <h2>Prerequisites</h2>
+                <div class="prerequisites">
+                    <h3><i class="fas fa-clipboard-list"></i> What You'll Need</h3>
+                    <ul>
+                        <li>Ubuntu Server 20.04 LTS or newer</li>
+                        <li>Minimum 4GB RAM, large storage capacity (500GB+ recommended)</li>
+                        <li>Root or sudo privileges</li>
+                        <li>Static IP address configured on your server</li>
+                        <li>Basic knowledge of Linux command line and Docker</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="installation" class="section">
+                <h2>Installation</h2>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">1</span> Update System and Install Dependencies</h3>
+                    <p>Start by updating your system and installing the necessary dependencies:</p>
+                    <div class="command">
+                        <pre><code>sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl git docker.io docker-compose</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>This ensures your system is up to date and installs Docker which is required for running Lancache.</p>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">2</span> Install Lancache</h3>
+                    <p>Create the directory structure and clone the necessary repositories:</p>
+                    <div class="command">
+                        <pre><code># Create lancache directory
+sudo mkdir -p /srv/lancache
+cd /srv/lancache
+
+# Clone the UK Lancans repository
+git clone https://github.com/uklans/cache-domains.git
+
+# Clone the lancache-docker repository
+git clone https://github.com/lancachenet/monolithic.git
+cd monolithic</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>These repositories contain the necessary configuration and Docker setup for Lancache.</p>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">3</span> Configure Lancache</h3>
+                    <p>Create and edit the environment configuration file:</p>
+                    <div class="command">
+                        <pre><code>cp .env.example .env
+nano .env</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Edit the .env file with your settings. Replace the IP address with your server's static IP:</p>
+                    <div class="command">
+                        <pre><code># Server IP and network configuration
+LANCACHE_IP=192.168.1.100  # Replace with your server's static IP
+CACHE_ROOT=/cache/data
+CACHE_DISK_SIZE=500g
+CACHE_MAX_AGE=3650d
+UPSTREAM_DNS=1.1.1.1 8.8.8.8
+
+# Service ports
+HTTP_PORT=80
+HTTPS_PORT=443</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <div class="note">
+                        <strong>Note:</strong> Make sure to use your server's actual IP address, not the example one shown here.
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">4</span> Create Cache Directory Structure</h3>
+                    <p>Create the directory where cached data will be stored and set appropriate permissions:</p>
+                    <div class="command">
+                        <pre><code>sudo mkdir -p /cache/data
+sudo chown -R $USER:$USER /cache</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>This ensures the cache directory exists and your user has the necessary permissions to write to it.</p>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">5</span> Start Lancache Services</h3>
+                    <p>Start the Lancache services using Docker Compose:</p>
+                    <div class="command">
+                        <pre><code>cd /srv/lancache/monolithic
+docker-compose up -d</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>This will download the necessary Docker images and start the Lancache service in the background.</p>
+                </div>
+            </section>
+
+            <section id="configuration" class="section">
+                <h2>Configuration</h2>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">1</span> Configure DNS (BIND9)</h3>
+                    <p>Install and configure BIND9 for DNS redirection to your Lancache server:</p>
+                    <div class="command">
+                        <pre><code>sudo apt install -y bind9</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Create the Lancache DNS configuration file:</p>
+                    <div class="command">
+                        <pre><code>sudo nano /etc/bind/named.conf.lancache</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Add the following content (replace 192.168.1.100 with your server IP):</p>
+                    <div class="command">
+                        <pre><code>zone "lancache" {
+    type master;
+    file "/etc/bind/db.lancache";
+};
+
+# Include game domains
+include "/etc/bind/named.conf.lancache-domains";</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">2</span> Generate Domain Lists</h3>
+                    <p>Generate the list of gaming domains that Lancache will handle:</p>
+                    <div class="command">
+                        <pre><code># Navigate to cache-domains
+cd /srv/lancache/cache-domains
+
+# Generate the domain list
+./scripts/create-list.sh</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>This script creates <code>output/list.txt</code> with all the gaming domains that Lancache will cache.</p>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">3</span> Generate Domain Configuration</h3>
+                    <p>Use the Python script to generate the BIND configuration for all game domains:</p>
+                    <div class="command">
+                        <pre><code>cd /srv/lancache/cache-domains
+sudo python3 /srv/lancache/cache-domains/scripts/create-bind-config.py \
+    --config /srv/lancache/cache-domains/config.json \
+    --output /etc/bind/named.conf.lancache-domains \
+    --ip 192.168.1.100</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Update the main BIND configuration to include the Lancache configuration:</p>
+                    <div class="command">
+                        <pre><code>sudo nano /etc/bind/named.conf</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Add this line at the end of the file:</p>
+                    <div class="command">
+                        <pre><code>include "/etc/bind/named.conf.lancache";</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Restart BIND9 to apply the changes:</p>
+                    <div class="command">
+                        <pre><code>sudo systemctl restart bind9</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="maintenance" class="section">
+                <h2>Maintenance</h2>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">1</span> Regular Updates</h3>
+                    <p>Keep your system and Lancache components updated:</p>
+                    <div class="command">
+                        <pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Update Docker images
+cd /srv/lancache/monolithic
+docker-compose pull
+docker-compose up -d
+
+# Update cache-domains repository
+cd /srv/lancache/cache-domains
+git pull origin master</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <div class="note">
+                        <strong>Tip:</strong> Set up a cron job to automatically update the cache-domains repository weekly.
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">2</span> Backup Strategy</h3>
+                    <p>Implement a backup strategy for your Lancache configuration:</p>
+                    <div class="command">
+                        <pre><code># Backup script for Lancache configuration
+#!/bin/bash
+BACKUP_DIR="/backup/lancache"
+DATE=$(date +%Y%m%d_%H%M%S)
+
+mkdir -p $BACKUP_DIR/$DATE
+
+# Backup Docker compose files
+cp -r /srv/lancache/monolithic $BACKUP_DIR/$DATE/
+
+# Backup DNS configuration
+cp -r /etc/bind $BACKUP_DIR/$DATE/
+
+# Backup environment configuration
+cp /srv/lancache/monolithic/.env $BACKUP_DIR/$DATE/
+
+echo "Backup completed: $BACKUP_DIR/$DATE"</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Schedule regular backups using cron:</p>
+                    <div class="command">
+                        <pre><code># Edit crontab
+sudo crontab -e
+
+# Add this line to run backup weekly
+0 3 * * 0 /path/to/backup-script.sh</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">3</span> Cache Management</h3>
+                    <p>Monitor and manage your cache storage:</p>
+                    <div class="command">
+                        <pre><code># Check cache disk usage
+du -sh /cache/data
+
+# Find largest cached items
+find /cache/data -type f -exec du -ah {} + | sort -rh | head -20
+
+# Set up log rotation for Docker containers
+sudo nano /etc/logrotate.d/docker-lancache</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Add the following log rotation configuration:</p>
+                    <div class="command">
+                        <pre><code>/var/lib/docker/containers/*/*.log {
+    rotate 7
+    daily
+    compress
+    missingok
+    delaycompress
+    copytruncate
+}</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="domain-updates" class="section">
+                <h2>Cache Domain Updates</h2>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">1</span> Manual Update Process</h3>
+                    <p>When cache domain changes are released, update your configuration:</p>
+                    <div class="command">
+                        <pre><code># Navigate to cache-domains directory
+cd /srv/lancache/cache-domains
+
+# Pull the latest changes
+git pull origin master
+
+# Regenerate the domain list
+./scripts/create-list.sh
+
+# Regenerate BIND configuration
+sudo python3 scripts/create-bind-config.py \
+    --config config.json \
+    --output /etc/bind/named.conf.lancache-domains \
+    --ip YOUR_SERVER_IP
+
+# Restart BIND9 to apply changes
+sudo systemctl restart bind9
+
+# Restart Lancache containers
+cd /srv/lancache/monolithic
+docker-compose restart</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">2</span> Automated Update Script</h3>
+                    <p>Create an automated script to handle domain updates:</p>
+                    <div class="command">
+                        <pre><code>#!/bin/bash
+# /usr/local/bin/update-lancache-domains.sh
+
+LOG_FILE="/var/log/lancache-updates.log"
+CACHE_DOMAINS_DIR="/srv/lancache/cache-domains"
+LANCACHE_IP="YOUR_SERVER_IP"
+
+echo "$(date): Starting Lancache domain update" >> $LOG_FILE
+
+# Update the repository
+cd $CACHE_DOMAINS_DIR
+git fetch origin
+
+# Check if updates are available
+if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
+    echo "$(date): Updates found, pulling changes" >> $LOG_FILE
+    git pull origin master
+    
+    # Regenerate domain list
+    ./scripts/create-list.sh
+    
+    # Regenerate BIND configuration
+    python3 scripts/create-bind-config.py \
+        --config config.json \
+        --output /etc/bind/named.conf.lancache-domains \
+        --ip $LANCACHE_IP
+    
+    # Restart services
+    systemctl restart bind9
+    cd /srv/lancache/monolithic
+    docker-compose restart
+    
+    echo "$(date): Update completed successfully" >> $LOG_FILE
+else
+    echo "$(date): No updates available" >> $LOG_FILE
+fi</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Make the script executable and schedule it with cron:</p>
+                    <div class="command">
+                        <pre><code>sudo chmod +x /usr/local/bin/update-lancache-domains.sh
+
+# Add to crontab to run daily at 2 AM
+sudo crontab -e
+# Add: 0 2 * * * /usr/local/bin/update-lancache-domains.sh</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="monitoring" class="section">
+                <h2>Monitoring</h2>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">1</span> Basic Health Checks</h3>
+                    <p>Create scripts to monitor your Lancache server health:</p>
+                    <div class="command">
+                        <pre><code>#!/bin/bash
+# /usr/local/bin/check-lancache-health.sh
+
+# Check if Docker containers are running
+if [ ! "$(docker ps -q -f name=monolithic_nginx_1)" ]; then
+    echo "Nginx container is not running!" | mail -s "Lancache Alert" admin@example.com
+fi
+
+if [ ! "$(docker ps -q -f name=monolithic_sniproxy_1)" ]; then
+    echo "SNIproxy container is not running!" | mail -s "Lancache Alert" admin@example.com
+fi
+
+# Check DNS resolution
+if ! nslookup steam.cache.lancache.net 127.0.0.1 >/dev/null 2>&1; then
+    echo "DNS resolution failed!" | mail -s "Lancache Alert" admin@example.com
+fi
+
+# Check disk space
+DISK_USAGE=$(df /cache | awk 'END{print $5}' | sed 's/%//')
+if [ $DISK_USAGE -gt 90 ]; then
+    echo "Cache disk is $DISK_USAGE% full!" | mail -s "Lancache Alert" admin@example.com
+fi</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    <p>Schedule health checks with cron:</p>
+                    <div class="command">
+                        <pre><code># Run every 5 minutes
+*/5 * * * * /usr/local/bin/check-lancache-health.sh</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">2</span> External Monitoring</h3>
+                    <p>Use external monitoring services to check if your Lancache server is accessible:</p>
+                    
+                    <h4>UptimeRobot Configuration</h4>
+                    <p>Set up monitors in UptimeRobot for:</p>
+                    <ul>
+                        <li>HTTP monitoring on port 80</li>
+                        <li>HTTPS monitoring on port 443</li>
+                        <li>DNS monitoring on port 53</li>
+                    </ul>
+                    
+                    <h4>Pingdom Configuration</h4>
+                    <p>Create checks in Pingdom for:</p>
+                    <ul>
+                        <li>HTTP service validation</li>
+                        <li>DNS resolution tests</li>
+                        <li>Transaction checks for specific game platforms</li>
+                    </ul>
+                    
+                    <h4>Simple curl-based monitoring</h4>
+                    <div class="command">
+                        <pre><code>#!/bin/bash
+# Check various endpoints
+ENDPOINTS=(
+    "http://lancache.example.com"
+    "http://steam.cache.lancache.net"
+    "http://origin.cache.lancache.net"
+)
+
+for endpoint in "${ENDPOINTS[@]}"; do
+    if ! curl -s -f --head $endpoint >/dev/null; then
+        echo "Endpoint $endpoint is down!" | mail -s "Lancache Alert" admin@example.com
+    fi
+done</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">3</span> Performance Monitoring</h3>
+                    <p>Set up monitoring tools to track Lancache performance:</p>
+                    
+                    <h4>Install and configure Netdata</h4>
+                    <div class="command">
+                        <pre><code># Install Netdata
+bash <(curl -Ss https://my-netdata.io/kickstart.sh)
+
+# Access Netdata at http://your-server-ip:19999</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    
+                    <h4>Monitor key metrics:</h4>
+                    <ul>
+                        <li>Bandwidth usage</li>
+                        <li>Cache hit ratio</li>
+                        <li>DNS query volume</li>
+                        <li>Disk I/O and storage capacity</li>
+                        <li>Docker container resource usage</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="troubleshooting" class="section">
+                <h2>Troubleshooting</h2>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">1</span> Common Issues</h3>
+                    
+                    <h4>DNS Resolution Problems</h4>
+                    <div class="command">
+                        <pre><code># Check if BIND is running
+sudo systemctl status bind9
+
+# Check DNS resolution
+nslookup steam.cache.lancache.net localhost
+
+# Check BIND logs
+sudo tail -f /var/log/bind9/query.log</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    
+                    <h4>Docker Container Issues</h4>
+                    <div class="command">
+                        <pre><code># Check container status
+docker ps -a
+docker logs monolithic_nginx_1
+docker logs monolithic_sniproxy_1
+
+# Restart containers
+cd /srv/lancache/monolithic
+docker-compose restart</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    
+                    <h4>Cache Not Working</h4>
+                    <div class="command">
+                        <pre><code># Check if cache is being used
+docker exec monolithic_nginx_1 tail -f /var/log/nginx/access.log
+
+# Check cache directory
+ls -la /cache/data
+du -sh /cache/data/* | sort -rh</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">2</span> Log Analysis</h3>
+                    <p>Important log files to check when troubleshooting:</p>
+                    
+                    <div class="command">
+                        <pre><code># Nginx access logs
+docker logs monolithic_nginx_1
+
+# Nginx error logs
+docker exec monolithic_nginx_1 tail -f /var/log/nginx/error.log
+
+# SNIproxy logs
+docker logs monolithic_sniproxy_1
+
+# BIND9 logs
+sudo tail -f /var/log/bind9/query.log
+sudo tail -f /var/log/bind9/error.log</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                </div>
+                
+                <div class="step-section">
+                    <h3><span class="step-number">3</span> Debug Mode</h3>
+                    <p>Enable debug mode for more detailed logging:</p>
+                    
+                    <div class="command">
+                        <pre><code># Edit the .env file
+cd /srv/lancache/monolithic
+nano .env
+
+# Add or change these lines
+NGINX_WORKER_PROCESSES=1
+DEBUG=1
+
+# Restart containers
+docker-compose down
+docker-compose up -d</code></pre>
+                        <button class="command-copy">Copy</button>
+                    </div>
+                    
+                    <p>With debug mode enabled, you'll get more verbose logging which can help identify issues.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="success-message" id="copySuccess">
+        <i class="fas fa-check-circle"></i> Command copied to clipboard!
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 Lancache Server Setup Guide | Created with <i class="fas fa-heart"></i> for gaming communities</p>
+            
+            <div class="footer-share">
+                <div class="share-btn facebook" onclick="shareOnFacebook()">
+                    <i class="fab fa-facebook-f"></i>
+                </div>
+                <div class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div class="share-btn telegram" onclick="shareOnTelegram()">
+                    <i class="fab fa-telegram-plane"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.command-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.parentElement.querySelector('code');
+                const textArea = document.createElement('textarea');
+                textArea.value = code.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Show success message
+                const successMessage = document.getElementById('copySuccess');
+                successMessage.style.display = 'block';
+                
+                // Hide message after 2 seconds
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Social sharing functions
+        function shareOnFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.title);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&t=${title}`, '_blank');
+        }
+
+        function shareOnWhatsApp() {
+            const url = encodeURIComponent(window.location.href);
+            const text = encodeURIComponent('Check out this Lancache Server Setup Guide: ');
+            window.open(`https://wa.me/?text=${text}${url}`, '_blank');
+        }
+
+        function shareOnTelegram() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(document.title);
+            window.open(`https://t.me/share/url?url=${url}&text=${title}`, '_blank');
+        }
+    </script>
+</body>
+</html>

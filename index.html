@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-site-verification" content="RVdMFnb21832uit_6PLDVmzq6kHsCzObIA7YmEeU8YA" />
+	
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KPP6F4S9');</script>
+<!-- End Google Tag Manager -->
+	
+
+  
+  <title>Server Projects - LearnLinuxOnline</title>
+  
+      <!-- ✅ SEO Meta Tags -->
+  <meta name="description" content="Step-by-step Linux server projects and tutorials. Learn to configure web servers, databases, VPN, monitoring, and more.">
+   <meta name="keywords" content="Linux server tutorials, Linux projects, Linux step by step guide, Apache server setup, Nginx configuration, MySQL tutorial, PostgreSQL setup, MongoDB on Linux, Redis configuration, Docker guide, Kubernetes cluster setup, WireGuard VPN tutorial, Samba file sharing, NFS setup, FTP server on Linux, Nagios monitoring, Zabbix monitoring, Ansible automation, FreeIPA server, LDAP configuration, PBX server setup, Linux email server, Proxmox virtualization, Bacula backup server, media automation with Radarr, Sonarr, Prowlarr, qBittorrent setup">
+
+ <meta name="author" content="LearnLinuxOnline">
+  <meta name="robots" content="index, follow">
+
+  <!-- ✅ Open Graph -->
+	<meta property="og:title" content="Linux Server Projects & Tutorials | LearnLinuxOnline">
+	<meta property="og:description" content="Explore practical Linux server projects and tutorials for web servers, databases, VPNs, monitoring, and DevOps tools.">
+	<meta property="og:image" content="https://learnlinuxonline.xyz/preview.png">
+	<meta property="og:url" content="https://learnlinuxonline.xyz/">
+
+
+  <!-- ✅ Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Linux Server Projects & Tutorials">
+	<meta name="twitter:description" content="Step-by-step Linux server tutorials and projects with LearnLinuxOnline.">
+	<meta name="twitter:image" content="https://learnlinuxonline.xyz/preview.png">
+  
+   <!-- ✅ Canonical -->
+  <link rel="canonical" href="https://learnlinuxonline.xyz/">
+  
+  
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Improved Light Color Scheme and Typography */
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+      --border: #cbd5e1;
+      --accent: #f59e0b;
+      --success: #10b981;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--light-gray);
+    }
+    
+    /* Header Styles */
+    header {
+      background: var(--light);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    
+    nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.3s;
+    }
+    
+    nav a:hover {
+      color: var(--primary);
+    }
+    
+    nav a.active {
+      color: var(--primary);
+    }
+    
+    nav a.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+    }
+    
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    
+    .hero {
+      text-align: center;
+      padding: 3rem 1rem;
+      background: var(--light);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+    }
+    
+    .hero h1 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-size: 2.5rem;
+    }
+    
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text);
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Search Box */
+    .search-container {
+      margin: 1.5rem 0;
+      position: relative;
+    }
+    
+    .search-box {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      padding-left: 3rem;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      font-size: 1rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    }
+    
+    .search-icon {
+      position: absolute;
+      left: 1.2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--dark-gray);
+    }
+    
+    /* Category Sections */
+    .category {
+      margin-bottom: 3rem;
+    }
+    
+    .category-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--medium-gray);
+    }
+    
+    .category-icon {
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-right: 1rem;
+    }
+    
+    .category-title {
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+    
+    /* Projects Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .project-card {
+      background: var(--light);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .project-card a {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      padding: 1.5rem;
+    }
+    
+    .project-icon {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+    
+    .project-card h3 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    .project-card p {
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+    
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+    
+    /* No results message */
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      background: var(--light);
+      border-radius: 12px;
+      color: var(--dark-gray);
+    }
+    
+    /* Quick filter buttons */
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      background: var(--light);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    
+    /* Footer */
+    footer {
+      background: var(--light);
+      text-align: center;
+      padding: 1.5rem;
+      margin-top: 3rem;
+      border-top: 1px solid var(--medium-gray);
+      color: var(--dark-gray);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1rem;
+      }
+      
+      nav {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+      }
+      
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .filter-buttons {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+	<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KPP6F4S9"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+	
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html">Student Login</a>
+    </nav>
+  </header>
+
+  <div class="main-content">
+    <div class="hero">
+      <h1>Server Projects & Tutorials</h1>
+      <p>Step-by-step guides to set up and configure various server applications on Linux systems. Perfect for beginners and advanced users alike.</p>
+    </div>
+    
+    <!-- Search Box -->
+    <div class="search-container">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" id="searchInput" class="search-box" placeholder="Search for server projects...">
+    </div>
+    
+    <!-- Quick Filter Buttons -->
+    <div class="filter-buttons">
+      <button class="filter-btn active" data-filter="all">All Projects</button>
+      <button class="filter-btn" data-filter="beginner">Beginner</button>
+      <button class="filter-btn" data-filter="intermediate">Intermediate</button>
+      <button class="filter-btn" data-filter="advanced">Advanced</button>
+      <button class="filter-btn" data-filter="database">Database</button>
+      <button class="filter-btn" data-filter="web">Web</button>
+      <button class="filter-btn" data-filter="monitoring">Monitoring</button>
+    </div>
+    
+    <!-- Web Servers Category -->
+    <div class="category" data-category="web">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-server"></i>
+        </div>
+        <h2 class="category-title">Web & Application Servers</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="beginner" data-tags="web server apache nginx">
+          <a href="web-server.html">
+            <div class="project-icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <h3>Web Server (Apache/Nginx)</h3>
+            <p>Configure Apache or Nginx web server on Ubuntu with SSL support and virtual hosts.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 45 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Beginner</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="media streaming">
+          <a href="xstream-server.html">
+            <div class="project-icon">
+              <i class="fas fa-stream"></i>
+            </div>
+            <h3>XStream Server</h3>
+            <p>Configure an XStream media server for content delivery.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1.5 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="media tv streaming">
+          <a href="tv-server-flussonic.html">
+            <div class="project-icon">
+              <i class="fas fa-tv"></i>
+            </div>
+            <h3>TV Server with Flussonic</h3>
+            <p>Build a media streaming server for live TV and video on demand.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 2 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Database Servers Category -->
+    <div class="category" data-category="database">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-database"></i>
+        </div>
+        <h2 class="category-title">Database Servers</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="intermediate" data-tags="database mysql mariadb">
+          <a href="MySQL-MariaDB.html">
+            <div class="project-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3>MySQL/MariaDB Server</h3>
+            <p>Install and configure MySQL or MariaDB database server on Linux systems.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 45 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="database postgresql">
+          <a href="PostgreSQL.html">
+            <div class="project-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3>PostgreSQL Server</h3>
+            <p>Set up a PostgreSQL database server with advanced features and performance tuning.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1 hour</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="database mongodb nosql">
+          <a href="MongoDB.html">
+            <div class="project-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3>MongoDB Server</h3>
+            <p>Install and configure MongoDB NoSQL database server for document storage.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1 hour</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="database redis cache">
+          <a href="Redis-Server.html">
+            <div class="project-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3>Redis Server</h3>
+            <p>Set up Redis in-memory data structure store for caching and messaging.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 45 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Network Services Category -->
+    <div class="category" data-category="network">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-network-wired"></i>
+        </div>
+        <h2 class="category-title">Network Services</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="beginner" data-tags="dns network">
+          <a href="dns-server.html">
+            <div class="project-icon">
+              <i class="fas fa-network-wired"></i>
+            </div>
+            <h3>DNS Server on Ubuntu</h3>
+            <p>Set up your own DNS server using BIND9 on Ubuntu for complete control over domain resolution.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 30 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Beginner</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="beginner" data-tags="ntp time network">
+          <a href="NTP.html">
+            <div class="project-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <h3>NTP Server</h3>
+            <p>Configure a Network Time Protocol server for time synchronization across your network.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 30 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Beginner</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="vpn security network">
+          <a href="wireguard-vpn.html">
+            <div class="project-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3>WireGuard VPN</h3>
+            <p>Set up a fast, modern and secure VPN server using WireGuard.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 45 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="cache network gaming">
+          <a href="lancache-server.html">
+            <div class="project-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h3>Lancache Server</h3>
+            <p>Create a local caching server for game downloads to save bandwidth.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1.5 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- File Services Category -->
+    <div class="category" data-category="storage">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <h2 class="category-title">File Services</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="intermediate" data-tags="file sharing samba windows">
+          <a href="Samba.html">
+            <div class="project-icon">
+              <i class="fas fa-network-wired"></i>
+            </div>
+            <h3>Samba Server</h3>
+            <p>Set up Samba for file and print sharing with Windows clients.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 45 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="file sharing nfs linux">
+          <a href="NFS-Server.html">
+            <div class="project-icon">
+              <i class="fas fa-share-alt"></i>
+            </div>
+            <h3>NFS Server</h3>
+            <p>Configure Network File System for sharing files between Linux/Unix systems.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 30 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="beginner" data-tags="ftp file transfer">
+          <a href="vsftpd.html">
+            <div class="project-icon">
+              <i class="fas fa-file-upload"></i>
+            </div>
+            <h3>vsFTPd Server</h3>
+            <p>Set up a secure and fast FTP server for file transfers.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 30 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Beginner</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="beginner" data-tags="sftp secure file transfer">
+          <a href="SFTP.html">
+            <div class="project-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <h3>SFTP Server</h3>
+            <p>Configure a secure FTP server using SSH for encrypted file transfers.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 30 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Beginner</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Monitoring & Management Category -->
+    <div class="category" data-category="monitoring">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h2 class="category-title">Monitoring & Management</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="intermediate" data-tags="monitoring cacti network">
+          <a href="cacti-monitoring.html">
+            <div class="project-icon">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <h3>Cacti Monitoring</h3>
+            <p>Install and configure Cacti for network monitoring and performance graphing.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1 hour</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="monitoring zabbix enterprise">
+          <a href="Zabbix.html">
+            <div class="project-icon">
+              <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <h3>Zabbix Monitoring</h3>
+            <p>Set up Zabbix for enterprise-level monitoring and alerting.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1.5 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="monitoring nagios system">
+          <a href="Linux-System-Monitoring-Nagios.html">
+            <div class="project-icon">
+              <i class="fas fa-heartbeat"></i>
+            </div>
+            <h3>Nagios Monitoring</h3>
+            <p>Configure Nagios for comprehensive system and network monitoring.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1.5 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="automation ansible configuration">
+          <a href="ansible-automation.html">
+            <div class="project-icon">
+              <i class="fas fa-cogs"></i>
+            </div>
+            <h3>Ansible Automation</h3>
+            <p>Automate server configuration and deployment with Ansible.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 2 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Identity & Authentication Category -->
+    <div class="category" data-category="security">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-user-lock"></i>
+        </div>
+        <h2 class="category-title">Identity & Authentication</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="advanced" data-tags="authentication freeipa identity">
+          <a href="FreeIPA.html">
+            <div class="project-icon">
+              <i class="fas fa-address-card"></i>
+            </div>
+            <h3>FreeIPA Server</h3>
+            <p>Set up FreeIPA for centralized identity management and authentication.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1.5 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="ldap directory authentication">
+          <a href="LDAP-Server.html">
+            <div class="project-icon">
+              <i class="fas fa-address-book"></i>
+            </div>
+            <h3>LDAP Server</h3>
+            <p>Configure an LDAP directory service for centralized user management.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1 hour</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Communication Services Category -->
+    <div class="category" data-category="communication">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-comments"></i>
+        </div>
+        <h2 class="category-title">Communication Services</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="intermediate" data-tags="pbx telephony voip">
+          <a href="issabel-pbx.html">
+            <div class="project-icon">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <h3>Issabel PBX</h3>
+            <p>Set up a complete PBX system for business telephony solutions.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1 hour</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="email mail server">
+          <a href="virtualmin-roundcube.html">
+            <div class="project-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <h3>Virtualmin + Roundcube</h3>
+            <p>Set up a complete mail server with web-based administration and webmail.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1.5 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Media & Entertainment Category -->
+    <div class="category" data-category="media">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-film"></i>
+        </div>
+        <h2 class="category-title">Media & Entertainment</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="intermediate" data-tags="media automation radarr sonarr">
+          <a href="radarr-sonarr-bazarr.html">
+            <div class="project-icon">
+              <i class="fas fa-film"></i>
+            </div>
+            <h3>Radarr, Sonarr, Bazarr</h3>
+            <p>Automate your media collection with these powerful management tools.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1 hour</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="intermediate" data-tags="media indexer prowlarr">
+          <a href="prowlarr.html">
+            <div class="project-icon">
+              <i class="fas fa-search"></i>
+            </div>
+            <h3>Prowlarr</h3>
+            <p>Manage your indexers for all your automation apps in one place.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 45 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Intermediate</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="beginner" data-tags="torrent download">
+          <a href="qbittorrent.html">
+            <div class="project-icon">
+              <i class="fas fa-download"></i>
+            </div>
+            <h3>qBittorrent</h3>
+            <p>Set up a headless torrent client with web interface for easy management.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 30 min</span>
+              <span><i class="fas fa-level-up-alt"></i> Beginner</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Virtualization & Backup Category -->
+    <div class="category" data-category="virtualization">
+      <div class="category-header">
+        <div class="category-icon">
+          <i class="fas fa-cloud"></i>
+        </div>
+        <h2 class="category-title">Virtualization & Backup</h2>
+      </div>
+      
+      <div class="projects-grid">
+        <div class="project-card" data-difficulty="advanced" data-tags="virtualization proxmox">
+          <a href="proxmox-ve.html">
+            <div class="project-icon">
+              <i class="fas fa-cloud"></i>
+            </div>
+            <h3>Proxmox VE</h3>
+            <p>Install and configure Proxmox Virtual Environment for server virtualization.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 1.5 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="docker kubernetes containers">
+          <a href="docker-kubernetes.html">
+            <div class="project-icon">
+              <i class="fab fa-docker"></i>
+            </div>
+            <h3>Docker & Kubernetes</h3>
+            <p>Containerize your applications and manage them with Kubernetes.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 3 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+        
+        <div class="project-card" data-difficulty="advanced" data-tags="backup bacula">
+          <a href="Bacula.html">
+            <div class="project-icon">
+              <i class="fas fa-hdd"></i>
+            </div>
+            <h3>Bacula Backup</h3>
+            <p>Set up a comprehensive network backup solution with Bacula.</p>
+            <div class="project-meta">
+              <span><i class="fas fa-clock"></i> 2 hours</span>
+              <span><i class="fas fa-level-up-alt"></i> Advanced</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // Search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('searchInput');
+      const projectCards = document.querySelectorAll('.project-card');
+      const categories = document.querySelectorAll('.category');
+      const filterButtons = document.querySelectorAll('.filter-btn');
+      
+      // Search function
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        let visibleCards = 0;
+        
+        projectCards.forEach(card => {
+          const title = card.querySelector('h3').textContent.toLowerCase();
+          const description = card.querySelector('p').textContent.toLowerCase();
+          const tags = card.getAttribute('data-tags').toLowerCase();
+          
+          if (title.includes(searchTerm) || description.includes(searchTerm) || tags.includes(searchTerm)) {
+            card.style.display = 'block';
+            visibleCards++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+        
+        // Show/hide categories based on visible cards
+        categories.forEach(category => {
+          const categoryCards = category.querySelectorAll('.project-card');
+          let visibleCategoryCards = 0;
+          
+          categoryCards.forEach(card => {
+            if (card.style.display !== 'none') {
+              visibleCategoryCards++;
+            }
+          });
+          
+          if (visibleCategoryCards > 0) {
+            category.style.display = 'block';
+          } else {
+            category.style.display = 'none';
+          }
+        });
+        
+        // Show no results message if no cards are visible
+        const noResults = document.getElementById('noResults');
+        if (visibleCards === 0 && searchTerm !== '') {
+          if (!noResults) {
+            const noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'noResults';
+            noResultsMsg.className = 'no-results';
+            noResultsMsg.innerHTML = `
+              <i class="fas fa-search fa-2x" style="margin-bottom: 1rem;"></i>
+              <h3>No projects found</h3>
+              <p>Try different search terms or browse using the category filters.</p>
+            `;
+            document.querySelector('.main-content').appendChild(noResultsMsg);
+          }
+        } else if (noResults) {
+          noResults.remove();
+        }
+      });
+      
+      // Filter buttons functionality
+      filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const filter = this.getAttribute('data-filter');
+          
+          // Update active button
+          filterButtons.forEach(btn => btn.classList.remove('active'));
+          this.classList.add('active');
+          
+          // Clear search input
+          searchInput.value = '';
+          
+          // Show all categories and cards first
+          categories.forEach(category => category.style.display = 'block');
+          projectCards.forEach(card => card.style.display = 'block');
+          
+          // Remove any existing no results message
+          const noResults = document.getElementById('noResults');
+          if (noResults) noResults.remove();
+          
+          // Apply filter
+          if (filter !== 'all') {
+            let visibleCards = 0;
+            
+            projectCards.forEach(card => {
+              const difficulty = card.getAttribute('data-difficulty');
+              const category = card.parentElement.parentElement.getAttribute('data-category');
+              
+              if (filter === difficulty || filter === category) {
+                card.style.display = 'block';
+                visibleCards++;
+              } else {
+                card.style.display = 'none';
+              }
+            });
+            
+            // Show/hide categories based on visible cards
+            categories.forEach(category => {
+              const categoryCards = category.querySelectorAll('.project-card');
+              let visibleCategoryCards = 0;
+              
+              categoryCards.forEach(card => {
+                if (card.style.display !== 'none') {
+                  visibleCategoryCards++;
+                }
+              });
+              
+              if (visibleCategoryCards > 0) {
+                category.style.display = 'block';
+              } else {
+                category.style.display = 'none';
+              }
+            });
+            
+            // Show no results message if no cards match the filter
+            if (visibleCards === 0) {
+              const noResultsMsg = document.createElement('div');
+              noResultsMsg.id = 'noResults';
+              noResultsMsg.className = 'no-results';
+              noResultsMsg.innerHTML = `
+                <i class="fas fa-filter fa-2x" style="margin-bottom: 1rem;"></i>
+                <h3>No projects match this filter</h3>
+                <p>Try selecting a different filter or browse all projects.</p>
+              `;
+              document.querySelector('.main-content').appendChild(noResultsMsg);
+            }
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

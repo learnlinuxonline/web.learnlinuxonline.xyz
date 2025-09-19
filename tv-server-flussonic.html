@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TV Server with Flussonic - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --primary:#2563eb; --primary-light:#3b82f6; --secondary:#059669; --light:#ffffff;
+      --light-gray:#f8fafc; --medium-gray:#e2e8f0; --dark-gray:#64748b; --text:#334155;
+      --text-dark:#1e293b; --border:#cbd5e1; --accent:#f59e0b; --success:#10b981; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;line-height:1.6;color:var(--text);background:var(--light-gray);}
+    header{background:var(--light);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:100;}
+    .logo{font-size:1.8rem;font-weight:700;color:var(--primary);}
+    nav{display:flex;gap:1.5rem;}
+    nav a{color:var(--text);text-decoration:none;font-weight:500;padding:.5rem 0;position:relative;transition:color .3s;}
+    nav a:hover{color:var(--primary);} nav a.active{color:var(--primary);}
+    nav a.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary);border-radius:3px;}
+    .breadcrumb{max-width:1200px;margin:1rem auto 0;padding:0 1.5rem;font-size:.9rem;color:var(--dark-gray);}
+    .breadcrumb a{color:var(--primary);text-decoration:none;} .breadcrumb a:hover{text-decoration:underline;}
+    .project-content{max-width:1200px;margin:1rem auto 2rem;padding:0 1.5rem;display:grid;grid-template-columns:1fr 3fr;gap:2rem;}
+    .project-nav{background:var(--light);padding:1.5rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.05);height:fit-content;position:sticky;top:90px;}
+    .project-nav h3{color:var(--primary);margin-top:0;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:2px solid var(--medium-gray);font-size:1.3rem;}
+    .project-nav ul{list-style:none;}
+    .project-nav li{margin:.8rem 0;}
+    .project-nav a{color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.7rem;padding:.7rem;border-radius:8px;transition:all .3s;font-weight:500;}
+    .project-nav a:hover{background:var(--primary-light);color:#fff;} .project-nav a.active{background:var(--primary);color:#fff;}
+    .project-details{background:var(--light);padding:2rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.05);}
+    .project-details h2{color:var(--primary);margin-bottom:1.5rem;font-size:1.8rem;}
+    .project-details p{margin-bottom:1.5rem;line-height:1.7;}
+    .prerequisites{background:var(--light-gray);padding:1.5rem;border-radius:10px;margin-bottom:2rem;border-left:4px solid var(--accent);}
+    .prerequisites h3{color:var(--primary);margin-top:0;margin-bottom:1rem;font-size:1.3rem;}
+    .prerequisites ul{padding-left:1.5rem;margin-bottom:0;} .prerequisites li{margin-bottom:.5rem;}
+    .step-section{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--medium-gray);}
+    .step-section h3{color:var(--primary);margin-bottom:1rem;font-size:1.3rem;display:flex;align-items:center;gap:.5rem;}
+    .step-number{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--primary);color:#fff;border-radius:50%;font-size:.9rem;margin-right:.5rem;}
+    pre{background:var(--light-gray);padding:1.2rem;border-radius:8px;overflow-x:auto;margin:1.2rem 0;border:1px solid var(--medium-gray);font-family:'Consolas','Monaco',monospace;font-size:.95rem;line-height:1.5;}
+    code{color:var(--secondary);font-family:'Consolas','Monaco',monospace;font-size:.95rem;}
+    .note{background:#fffbeb;padding:1.2rem;border-radius:8px;margin:1.2rem 0;border-left:4px solid var(--accent);} .note strong{color:var(--accent);}
+    footer{background:var(--light);text-align:center;padding:1.5rem;margin-top:3rem;border-top:1px solid var(--medium-gray);color:var(--dark-gray);}
+    .command{position:relative;} .command-copy{position:absolute;top:.5rem;right:.5rem;background:var(--primary-light);color:#fff;border:none;padding:.3rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem;transition:background .3s;}
+    .command-copy:hover{background:var(--primary);} .success-message{position:fixed;bottom:20px;right:20px;background:var(--success);color:#fff;padding:.8rem 1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.1);display:none;z-index:1000;}
+    .tutorial-nav{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1rem;border-top:1px solid var(--medium-gray);}
+    .tutorial-nav a{color:var(--primary);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:.5rem;}
+    .tutorial-nav a:hover{text-decoration:underline;}
+    @media (max-width:900px){.project-content{grid-template-columns:1fr;} .project-nav{position:static;margin-bottom:1.5rem;} header{flex-direction:column;text-align:center;padding:1rem;} nav{margin-top:1rem;flex-wrap:wrap;justify-content:center;gap:1rem;}}
+    @media (max-width:600px){.project-content{padding:0 1rem;} .project-details,.project-nav{padding:1.2rem;} .project-details h2{font-size:1.5rem;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; TV Server with Flussonic
+  </div>
+
+  <div class="project-content">
+    <!-- Sidebar -->
+    <aside class="project-nav">
+      <h3>Server Projects</h3>
+      <ul>
+        <li><a href="dns-server.html"><i class="fas fa-network-wired"></i> DNS Server on Ubuntu</a></li>
+        <li><a href="web-server.html"><i class="fas fa-server"></i> Web Server</a></li>
+        <li><a href="cacti-monitoring.html"><i class="fas fa-chart-line"></i> Cacti Monitoring</a></li>
+        <li><a href="lancache-server.html"><i class="fas fa-database"></i> Lancache Server</a></li>
+        <li><a href="issabel-pbx.html"><i class="fas fa-phone-alt"></i> Issabel PBX</a></li>
+        <li><a href="tv-server-flussonic.html" class="active"><i class="fas fa-tv"></i> TV Server with Flussonic</a></li>
+        <li><a href="xstream-server.html"><i class="fas fa-stream"></i> XStream Server</a></li>
+        <li><a href="virtualmin-roundcube.html"><i class="fas fa-envelope"></i> Virtualmin + Roundcube</a></li>
+        <li><a href="radarr-sonarr-bazarr.html"><i class="fas fa-film"></i> Radarr, Sonarr, Bazarr</a></li>
+        <li><a href="prowlarr.html"><i class="fas fa-search"></i> Prowlarr</a></li>
+        <li><a href="proxmox-ve.html"><i class="fas fa-cloud"></i> Proxmox VE</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="project-details">
+      <h2>TV Server with Flussonic</h2>
+      <p>Flussonic হলো একটি professional streaming server যেটা RTMP/UDP/HLS ইনপুট নিতে পারে এবং HLS/DASH আউটপুট দিতে পারে। DVR, Timeshift, Multi-bitrate streaming ইত্যাদি supported।</p>
+
+      <div class="prerequisites">
+        <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+        <ul>
+          <li>Ubuntu 20.04 / 22.04 Server (Static IP)</li>
+          <li>Valid Flussonic License</li>
+          <li>Firewall এ 80/443 port খুলে রাখা</li>
+        </ul>
+      </div>
+
+      <div class="step-section">
+        <h3><span class="step-number">1</span> Flussonic Install</h3>
+        <div class="command">
+          <pre><code>sudo apt update
+sudo apt install -y curl gnupg apt-transport-https ca-certificates
+echo "deb [arch=amd64] https://repo.flussonic.com/ $(. /etc/os-release; echo $VERSION_CODENAME) main" | \
+sudo tee /etc/apt/sources.list.d/flussonic.list
+curl -fsSL https://repo.flussonic.com/flussonic.gpg | sudo gpg --dearmor -o /usr/share/keyrings/flussonic.gpg
+sudo apt update
+sudo apt install -y flussonic</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <h3><span class="step-number">2</span> Enable & Access UI</h3>
+        <div class="command">
+          <pre><code>sudo systemctl enable --now flussonic
+sudo systemctl status flussonic
+# WebUI: http://server-ip:80 অথবা https://your-domain/</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+
+      <div class="step-section">
+        <h3><span class="step-number">3</span> Stream Add করা</h3>
+        <p><code>/etc/flussonic/flussonic.conf</code> edit করুন:</p>
+        <div class="command">
+          <pre><code>sudo nano /etc/flussonic/flussonic.conf</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>Example config:</p>
+        <div class="command">
+          <pre><code>stream mychannel {
+  url udp://239.0.0.1:1234;   # অথবা rtmp://source/live/stream
+  dvr /var/lib/flussonic/dvr/mychannel 7d;
+  hls path=/flussonic/mychannel.m3u8;
+}</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <div class="command">
+          <pre><code>sudo systemctl restart flussonic</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+        <p>প্লে করুন: <code>http://server-ip/flussonic/mychannel.m3u8</code></p>
+      </div>
+
+      <div class="step-section">
+        <h3><span class="step-number">4</span> Nginx Reverse Proxy (Optional)</h3>
+        <div class="command">
+          <pre><code>sudo apt install -y nginx
+sudo tee /etc/nginx/sites-available/flussonic.conf &gt;/dev/null &lt;&lt;'NGX'
+server {
+  listen 80;
+  server_name yourdomain.com;
+  location / {
+    proxy_pass http://127.0.0.1:80;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+NGX
+sudo ln -s /etc/nginx/sites-available/flussonic.conf /etc/nginx/sites-enabled/
+sudo nginx -t &amp;&amp; sudo systemctl reload nginx</code></pre>
+          <button class="command-copy">Copy</button>
+        </div>
+      </div>
+
+      <div class="tutorial-nav">
+        <a href="issabel-pbx.html"><i class="fas fa-arrow-left"></i> Previous: Issabel PBX</a>
+        <a href="xstream-server.html">Next: XStream Server <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </main>
+  </div>
+
+  <div class="success-message" id="copy-success">
+    <i class="fas fa-check-circle"></i> Command copied to clipboard!
+  </div>
+
+  <footer>
+    <p>&copy; 2025 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.command-copy').forEach(button => {
+      button.addEventListener('click', function() {
+        const code = this.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          const successMsg = document.getElementById('copy-success');
+          successMsg.style.display = 'block';
+          setTimeout(() => { successMsg.style.display = 'none'; }, 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

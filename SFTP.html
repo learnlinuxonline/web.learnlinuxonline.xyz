@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SFTP Server with OpenSSH - LearnLinuxOnline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --text: #334155;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+        }
+        
+        header {
+            background: var(--light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a.active {
+            color: var(--primary);
+        }
+        
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .breadcrumb {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .project-content {
+            max-width: 1200px;
+            margin: 1rem auto 2rem;
+            padding: 0 1.5rem;
+        }
+        
+        .project-details {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .project-details h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .project-details p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .prerequisites {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .prerequisites h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .prerequisites ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+            list-style-type: none;
+        }
+        
+        .prerequisites li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .prerequisites li:before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .step-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .step-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-section h3 .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        
+        pre {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            border: 1px solid var(--medium-gray);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        code {
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .note {
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .note strong {
+            color: var(--accent);
+        }
+        
+        .warning {
+            background: #fef2f2;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .warning strong {
+            color: #ef4444;
+        }
+        
+        .info {
+            background: #eff6ff;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info strong {
+            color: var(--primary);
+        }
+        
+        footer {
+            background: var(--light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            nav {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .project-content {
+                padding: 0 1rem;
+            }
+            
+            .project-details {
+                padding: 1.2rem;
+            }
+            
+            .project-details h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .command {
+            position: relative;
+        }
+        
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .command-copy:hover {
+            background: var(--primary);
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .tutorial-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .tutorial-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tutorial-nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .config-table th, .config-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .config-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        .config-table tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-card {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .feature-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LearnLinuxOnline</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="courses.html">Courses</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &raquo; SFTP Server with OpenSSH
+    </div>
+
+    <div class="project-content">
+        <main class="project-details">
+            <h2>SFTP Server with OpenSSH on Ubuntu 22.04 LTS</h2>
+            <p>SFTP (SSH File Transfer Protocol) is a secure file transfer protocol that provides file access, transfer, and management over a reliable data stream. It's built on SSH and provides all the security features of SSH, including encryption and authentication.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4><i class="fas fa-shield-alt"></i> Enhanced Security</h4>
+                    <p>SFTP uses SSH encryption to protect both commands and data, preventing passwords and sensitive information from being transmitted in clear text.</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-bolt"></i> Single Connection</h4>
+                    <p>Unlike FTP, SFTP uses a single connection for both control commands and data transfer, simplifying firewall configuration.</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-tasks"></i> Integrated Features</h4>
+                    <p>SFTP includes file management capabilities like permission manipulation, file locking, and more, beyond simple file transfer.</p>
+                </div>
+            </div>
+            
+            <div class="prerequisites">
+                <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+                <ul>
+                    <li>Ubuntu 22.04 LTS server</li>
+                    <li>Minimum 1GB RAM (2GB recommended)</li>
+                    <li>Sufficient disk space for your file storage needs</li>
+                    <li>Root or sudo privileges</li>
+                    <li>Static IP address configured</li>
+                    <li>Basic knowledge of Linux command line</li>
+                </ul>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">1</span> System Preparation</h3>
+                <p>Update your system and set the hostname:</p>
+                <div class="command">
+                    <pre><code>sudo apt update && sudo apt upgrade -y
+sudo hostnamectl set-hostname sftp-server
+exec bash</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Install necessary utilities:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y wget curl nano ufw</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">2</span> Install OpenSSH Server</h3>
+                <p>Check if OpenSSH server is already installed:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status ssh</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>If not installed, install OpenSSH server:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y openssh-server</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Enable and start the SSH service:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl enable ssh
+sudo systemctl start ssh</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">3</span> Configure Firewall</h3>
+                <p>Allow SSH through the firewall:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow ssh
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the firewall status:</p>
+                <div class="command">
+                    <pre><code>sudo ufw status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">4</span> Create SFTP User and Directory Structure</h3>
+                <p>Create a group for SFTP users:</p>
+                <div class="command">
+                    <pre><code>sudo groupadd sftp-users</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create a dedicated SFTP user:</p>
+                <div class="command">
+                    <pre><code>sudo useradd -m -G sftp-users -s /bin/bash sftpuser
+sudo passwd sftpuser</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Create the SFTP directory structure:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /var/sftp/uploads
+sudo chown root:root /var/sftp
+sudo chmod 755 /var/sftp
+sudo chown sftpuser:sftp-users /var/sftp/uploads</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">5</span> Configure SSH for SFTP</h3>
+                <p>Back up the original SSH configuration file:</p>
+                <div class="command">
+                    <pre><code>sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Edit the SSH configuration file:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/ssh/sshd_config</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add the following configuration at the end of the file:</p>
+                <div class="command">
+                    <pre><code># SFTP configuration
+Match Group sftp-users
+    ChrootDirectory /var/sftp
+    ForceCommand internal-sftp
+    PasswordAuthentication yes
+    PermitTunnel no
+    AllowAgentForwarding no
+    AllowTcpForwarding no
+    X11Forwarding no</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <div class="note">
+                    <strong>Note:</strong> The ChrootDirectory must be owned by root and not writable by any other user or group.
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">6</span> Restart SSH Service</h3>
+                <p>Restart the SSH service to apply changes:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart ssh</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check the status to ensure it's running properly:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status ssh</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">7</span> Test SFTP Connection</h3>
+                <p>Test the SFTP connection from the local machine:</p>
+                <div class="command">
+                    <pre><code>sftp sftpuser@localhost</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test file upload:</p>
+                <div class="command">
+                    <pre><code>echo "Test file content" > testfile.txt
+sftp sftpuser@localhost
+put testfile.txt uploads/
+exit</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the file was uploaded:</p>
+                <div class="command">
+                    <pre><code>sudo ls -la /var/sftp/uploads/</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">8</span> Configure Public Key Authentication</h3>
+                <p>Generate SSH key pair on client machine (if needed):</p>
+                <div class="command">
+                    <pre><code>ssh-keygen -t rsa -b 4096 -C "sftpuser@example.com"</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Copy the public key to the SFTP server:</p>
+                <div class="command">
+                    <pre><code>ssh-copy-id sftpuser@your_server_ip</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Alternatively, manually add the public key:</p>
+                <div class="command">
+                    <pre><code>sudo mkdir -p /home/sftpuser/.ssh
+sudo nano /home/sftpuser/.ssh/authorized_keys
+sudo chown sftpuser:sftpuser /home/sftpuser/.ssh
+sudo chown sftpuser:sftpuser /home/sftpuser/.ssh/authorized_keys
+sudo chmod 700 /home/sftpuser/.ssh
+sudo chmod 600 /home/sftpuser/.ssh/authorized_keys</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test key-based authentication:</p>
+                <div class="command">
+                    <pre><code>sftp -i ~/.ssh/private_key sftpuser@your_server_ip</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">9</span> Advanced Configuration</h3>
+                <p>Configure multiple SFTP users with different directories:</p>
+                <div class="command">
+                    <pre><code>sudo useradd -m -G sftp-users -s /bin/bash sftpuser2
+sudo passwd sftpuser2
+sudo mkdir -p /var/sftp/user2_uploads
+sudo chown root:root /var/sftp/user2_uploads
+sudo chmod 755 /var/sftp/user2_uploads
+sudo mkdir /var/sftp/user2_uploads/uploads
+sudo chown sftpuser2:sftp-users /var/sftp/user2_uploads/uploads</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add user-specific configuration to sshd_config:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/ssh/sshd_config</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add user-specific directives:</p>
+                <div class="command">
+                    <pre><code>Match User sftpuser2
+    ChrootDirectory /var/sftp/user2_uploads
+    ForceCommand internal-sftp
+    PasswordAuthentication yes
+    PermitTunnel no
+    AllowAgentForwarding no
+    AllowTcpForwarding no
+    X11Forwarding no</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">10</span> Security Hardening</h3>
+                <p>Disable root login and password authentication (optional):</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/ssh/sshd_config</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Change these settings in the main configuration section:</p>
+                <div class="command">
+                    <pre><code>PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Change the default SSH port (optional):</p>
+                <div class="command">
+                    <pre><code>Port 2222</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Allow only specific users to connect:</p>
+                <div class="command">
+                    <pre><code>AllowUsers sftpuser sftpuser2</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Restart SSH after making changes:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart ssh</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">11</span> Troubleshooting Common Issues</h3>
+                <p>Check SSH service status:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status ssh
+sudo journalctl -u ssh -f</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check SSH logs for connection issues:</p>
+                <div class="command">
+                    <pre><code>sudo tail -f /var/log/auth.log | grep ssh</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Test SSH configuration for errors:</p>
+                <div class="command">
+                    <pre><code>sudo sshd -t</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common issues and solutions:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>Connection refused</td>
+                        <td>Check firewall settings and SSH service status</td>
+                    </tr>
+                    <tr>
+                        <td>Permission denied</td>
+                        <td>Verify directory permissions and ownership</td>
+                    </tr>
+                    <tr>
+                        <td>Chroot directory ownership issues</td>
+                        <td>Ensure chroot directory is owned by root</td>
+                    </tr>
+                    <tr>
+                        <td>Authentication failures</td>
+                        <td>Check authorized_keys file permissions</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tutorial-nav">
+                <a href="ftp-server.html"><i class="fas fa-arrow-left"></i> Previous: FTP Server</a>
+                <a href="ldap-server.html">Next: LDAP Server <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <div class="success-message" id="copy-success">
+        <i class="fas fa-check-circle"></i> Command copied to clipboard!
+    </div>
+
+    <footer>
+        <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.command-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.previousElementSibling.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const successMsg = document.getElementById('copy-success');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

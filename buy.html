@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buy Now - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+    }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light-gray); color: var(--text); margin: 0; }
+    header { background: var(--light); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .logo { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+    nav { display: flex; gap: 1.5rem; }
+    nav a { color: var(--text); text-decoration: none; font-weight: 500; position: relative; }
+    nav a.active { color: var(--primary); }
+    nav a.active::after { content: ''; position: absolute; bottom: -5px; left: 0; right: 0; height: 3px; background: var(--primary); border-radius: 3px; }
+    .buy-container { max-width: 900px; margin: 2rem auto; padding: 2rem; background: var(--light); border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    h1 { color: var(--primary); margin-bottom: 1.5rem; text-align: center; }
+    .payment-info { margin-bottom: 2rem; }
+    .payment-info p { margin: 0.5rem 0; }
+    .steps { margin-bottom: 2rem; }
+    .steps li { margin: 0.8rem 0; }
+    .example-box { background: var(--light-gray); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid var(--medium-gray); }
+    .qr-section { display: flex; gap: 2rem; margin-top: 2rem; justify-content: center; }
+    .qr-box { text-align: center; }
+    .qr-box img { width: 150px; height: 150px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: transform 0.3s; }
+    .qr-box img:hover { transform: scale(1.05); }
+    footer { background: var(--light); text-align: center; padding: 1.5rem; margin-top: 3rem; border-top: 1px solid var(--medium-gray); color: var(--dark-gray); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="buy.html" class="active">Buy Now</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="buy-container">
+    <h1><i class="fas fa-shopping-cart"></i> Buy Now</h1>
+
+    <div class="payment-info">
+      <h2><i class="fas fa-money-bill-wave"></i> Payment Numbers</h2>
+      <p><strong>bKash:</strong> 01744906268</p>
+      <p><strong>Nagad:</strong> 01744906268</p>
+    </div>
+
+    <div class="steps">
+      <h2><i class="fas fa-tasks"></i> How to Order</h2>
+      <ol>
+        <li>First, join our <strong>WhatsApp</strong> or <strong>Telegram</strong> group and knock for order confirmation.</li>
+        <li>Send the course fee to the above <strong>bKash</strong> or <strong>Nagad</strong> number.</li>
+        <li>Share your payment proof in the group or via message.</li>
+      </ol>
+    </div>
+
+    <div class="qr-section">
+      <div class="qr-box">
+        <h3><i class="fab fa-telegram"></i> Telegram Group</h3>
+        <img src="telegram.jpg" alt="Telegram QR Code">
+      </div>
+      <div class="qr-box">
+        <h3><i class="fab fa-whatsapp"></i> WhatsApp Group</h3>
+        <img src="whatsapp.jpeg" alt="WhatsApp QR Code">
+      </div>
+    </div>
+
+    <div class="example-box">
+      <h3><i class="fas fa-receipt"></i> Payment Proof Example</h3>
+      <p><strong>Name:</strong> Your Full Name</p>
+      <p><strong>Payment Method:</strong> bKash / Nagad</p>
+      <p><strong>Number (Last 4 Digits):</strong> *****6268</p>
+      <p><strong>Trx ID:</strong> CHE3FC1C17</p>
+      <p><strong>Date:</strong> 25/08/2025</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+</body>
+</html>

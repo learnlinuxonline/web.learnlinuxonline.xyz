@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Virtualmin + Roundcube - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --primary:#2563eb; --primary-light:#3b82f6; --secondary:#059669; --light:#ffffff;
+      --light-gray:#f8fafc; --medium-gray:#e2e8f0; --dark-gray:#64748b; --text:#334155;
+      --text-dark:#1e293b; --border:#cbd5e1; --accent:#f59e0b; --success:#10b981; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;line-height:1.6;color:var(--text);background:var(--light-gray);}
+    header{background:var(--light);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;
+      box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:100;}
+    .logo{font-size:1.8rem;font-weight:700;color:var(--primary);}
+    nav{display:flex;gap:1.5rem;}
+    nav a{color:var(--text);text-decoration:none;font-weight:500;padding:.5rem 0;position:relative;transition:color .3s;}
+    nav a:hover{color:var(--primary);} nav a.active{color:var(--primary);}
+    nav a.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary);border-radius:3px;}
+    .breadcrumb{max-width:1200px;margin:1rem auto 0;padding:0 1.5rem;font-size:.9rem;color:var(--dark-gray);}
+    .breadcrumb a{color:var(--primary);text-decoration:none;} .breadcrumb a:hover{text-decoration:underline;}
+    .project-content{max-width:1200px;margin:1rem auto 2rem;padding:0 1.5rem;display:grid;grid-template-columns:1fr 3fr;gap:2rem;}
+    .project-nav{background:var(--light);padding:1.5rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.05);height:fit-content;position:sticky;top:90px;}
+    .project-nav h3{color:var(--primary);margin-top:0;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:2px solid var(--medium-gray);font-size:1.3rem;}
+    .project-nav ul{list-style:none;}
+    .project-nav li{margin:.8rem 0;}
+    .project-nav a{color:var(--text);text-decoration:none;display:flex;align-items:center;gap:.7rem;padding:.7rem;border-radius:8px;transition:all .3s;font-weight:500;}
+    .project-nav a:hover{background:var(--primary-light);color:#fff;} .project-nav a.active{background:var(--primary);color:#fff;}
+    .project-details{background:var(--light);padding:2rem;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.05);}
+    .project-details h2{color:var(--primary);margin-bottom:1.5rem;font-size:1.8rem;}
+    .project-details p{margin-bottom:1.5rem;line-height:1.7;}
+    .prerequisites{background:var(--light-gray);padding:1.5rem;border-radius:10px;margin-bottom:2rem;border-left:4px solid var(--accent);}
+    .prerequisites h3{color:var(--primary);margin-top:0;margin-bottom:1rem;font-size:1.3rem;}
+    .prerequisites ul{padding-left:1.5rem;margin-bottom:0;} .prerequisites li{margin-bottom:.5rem;}
+    .step-section{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--medium-gray);}
+    .step-section h3{color:var(--primary);margin-bottom:1rem;font-size:1.3rem;display:flex;align-items:center;gap:.5rem;}
+    .step-number{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:var(--primary);color:#fff;border-radius:50%;font-size:.9rem;margin-right:.5rem;}
+    pre{background:var(--light-gray);padding:1.2rem;border-radius:8px;overflow-x:auto;margin:1.2rem 0;border:1px solid var(--medium-gray);font-family:'Consolas','Monaco',monospace;font-size:.95rem;line-height:1.5;}
+    code{color:var(--secondary);font-family:'Consolas','Monaco',monospace;font-size:.95rem;}
+    .note{background:#fffbeb;padding:1.2rem;border-radius:8px;margin:1.2rem 0;border-left:4px solid var(--accent);} .note strong{color:var(--accent);}
+    footer{background:var(--light);text-align:center;padding:1.5rem;margin-top:3rem;border-top:1px solid var(--medium-gray);color:var(--dark-gray);}
+    .command{position:relative;} .command-copy{position:absolute;top:.5rem;right:.5rem;background:var(--primary-light);color:#fff;border:none;padding:.3rem .7rem;border-radius:4px;cursor:pointer;font-size:.8rem;transition:background .3s;}
+    .command-copy:hover{background:var(--primary);} .success-message{position:fixed;bottom:20px;right:20px;background:var(--success);color:#fff;padding:.8rem 1.5rem;border-radius:8px;box-shadow:0 4px 6px rgba(0,0,0,.1);display:none;z-index:1000;}
+    .tutorial-nav{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1rem;border-top:1px solid var(--medium-gray);}
+    .tutorial-nav a{color:var(--primary);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:.5rem;}
+    .tutorial-nav a:hover{text-decoration:underline;}
+    .tabs{display:flex;margin-bottom:1.5rem;border-bottom:1px solid var(--medium-gray);}
+    .tab{padding:.8rem 1.5rem;cursor:pointer;font-weight:500;border-bottom:3px solid transparent;transition:all .3s;}
+    .tab.active{color:var(--primary);border-bottom:3px solid var(--primary);}
+    .tab-content{display:none;}
+    .tab-content.active{display:block;}
+    @media (max-width:900px){.project-content{grid-template-columns:1fr;} .project-nav{position:static;margin-bottom:1.5rem;} header{flex-direction:column;text-align:center;padding:1rem;} nav{margin-top:1rem;flex-wrap:wrap;justify-content:center;gap:1rem;}}
+    @media (max-width:600px){.project-content{padding:0 1rem;} .project-details,.project-nav{padding:1.2rem;} .project-details h2{font-size:1.5rem;}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">LearnLinuxOnline</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="courses.html">Courses</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <div class="breadcrumb">
+    <a href="index.html">Home</a> &raquo; Virtualmin + Roundcube
+  </div>
+
+  <div class="project-content">
+    <!-- Sidebar -->
+    <aside class="project-nav">
+      <h3>Server Projects</h3>
+      <ul>
+        <li><a href="dns-server.html"><i class="fas fa-network-wired"></i> DNS Server on Ubuntu</a></li>
+        <li><a href="web-server.html"><i class="fas fa-server"></i> Web Server</a></li>
+        <li><a href="cacti-monitoring.html"><i class="fas fa-chart-line"></i> Cacti Monitoring</a></li>
+        <li><a href="lancache-server.html"><i class="fas fa-database"></i> Lancache Server</a></li>
+        <li><a href="issabel-pbx.html"><i class="fas fa-phone-alt"></i> Issabel PBX</a></li>
+        <li><a href="tv-server-flussonic.html"><i class="fas fa-tv"></i> TV Server with Flussonic</a></li>
+        <li><a href="xstream-server.html"><i class="fas fa-stream"></i> XStream Server</a></li>
+        <li><a href="virtualmin-roundcube.html" class="active"><i class="fas fa-envelope"></i> Virtualmin + Roundcube</a></li>
+        <li><a href="radarr-sonarr-bazarr.html"><i class="fas fa-film"></i> Radarr, Sonarr, Bazarr</a></li>
+        <li><a href="prowlarr.html"><i class="fas fa-search"></i> Prowlarr</a></li>
+        <li><a href="proxmox-ve.html"><i class="fas fa-cloud"></i> Proxmox VE</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="project-details">
+      <h2>Virtualmin + Roundcube</h2>
+      <p>Virtualmin হলো Webmin-এর উপর ভিত্তি করা একটি হোস্টিং কন্ট্রোল প্যানেল—Apache/Nginx, BIND, Postfix, Dovecot, MySQL/MariaDB, PHP ইত্যাদি অটোমেটিক কনফিগার করে। Roundcube হলো আধুনিক ওয়েবমেইল ক্লায়েন্ট (IMAP/SMTP)।</p>
+
+      <div class="prerequisites">
+        <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+        <ul>
+          <li>Ubuntu 22.04/24.04 (Static Public IP recommended)</li>
+          <li>FQDN hostname (e.g., <code>server.example.com</code>)</li>
+          <li>DNS এ A/MX/SPF/DKIM/DMARC রেকর্ড যোগ করার অ্যাক্সেস</li>
+          <li>Open ports: 22, 25, 53, 80, 110, 143, 443, 465, 587, 993, 995, 10000, 20000</li>
+        </ul>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="virtualmin">Virtualmin</div>
+        <div class="tab" data-tab="roundcube">Roundcube</div>
+      </div>
+
+      <!-- Virtualmin -->
+      <section id="virtualmin-content" class="tab-content active">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Pre-setup: Hostname, Update</h3>
+          <div class="command">
+            <pre><code>sudo hostnamectl set-hostname server.example.com
+echo "127.0.1.1 server.example.com server" | sudo tee -a /etc/hosts
+sudo apt update &amp;&amp; sudo apt -y upgrade &amp;&amp; sudo reboot</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">2</span> One-command Install (Virtualmin GPL)</h3>
+          <div class="command">
+            <pre><code>wget https://software.virtualmin.com/gpl/scripts/install.sh
+sudo /bin/sh install.sh -y</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>Access:</strong> Web UI → <code>https://server.example.com:10000/</code> (root user)। Initial post-install wizard complete করুন।</div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">3</span> DNS & Mail basics</h3>
+          <p>আপনার ডোমেইন <code>example.com</code> এর জন্য নিচের রেকর্ডগুলি যোগ করুন:</p>
+          <div class="command">
+            <pre><code># Example DNS
+A     server     203.0.113.10
+A     mail       203.0.113.10
+MX    @          10 mail.example.com.
+TXT   @          "v=spf1 mx a ip4:203.0.113.10 -all"
+TXT   _dmarc     "v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com;"</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Virtualmin → <em>Email Settings</em> থেকে DKIM enable করুন; DNS-এ DKIM TXT key publish করুন।</p>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">4</span> Create Virtual Server (site)</h3>
+          <div class="command">
+            <pre><code># Web UI Steps:
+# Virtualmin → Create Virtual Server → Domain name: example.com
+# Enabled features: Apache website, Mail for domain, MySQL (optional), BIND DNS (if authoritative)
+# Create!</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>Mailbox Users:</strong> Virtualmin → Edit Users → Add a user → “Email only” বা “Website login” টাইপ দিন।</div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">5</span> SSL (Let's Encrypt)</h3>
+          <div class="command">
+            <pre><code># Web UI:
+# Virtualmin → Server Configuration → SSL Certificate → Let's Encrypt
+# Domains to request: example.com, www.example.com, mail.example.com
+# Request Certificate
+# তারপর "Copy to Postfix" এবং "Copy to Dovecot" বাটন ক্লিক করুন</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">6</span> Mail ports & test (Postfix/Dovecot)</h3>
+          <div class="command">
+            <pre><code># SMTP (submission/SMTPS):
+# 587 (STARTTLS), 465 (TLS)
+# IMAP: 143(STARTTLS) / 993(TLS)
+# POP3: 110(STARTTLS) / 995(TLS)
+
+# টেস্ট (from server):
+telnet 127.0.0.1 25
+openssl s_client -starttls smtp -crlf -connect 127.0.0.1:587
+openssl s_client -connect 127.0.0.1:993</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Roundcube -->
+      <section id="roundcube-content" class="tab-content">
+        <div class="step-section">
+          <h3><span class="step-number">1</span> Install prerequisites</h3>
+          <div class="command">
+            <pre><code>sudo apt update
+sudo apt install -y apache2 mariadb-server php php-cli php-common php-intl php-xml \
+php-mbstring php-zip php-gd php-curl php-mysql unzip</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">2</span> Database & User (Roundcube)</h3>
+          <div class="command">
+            <pre><code>sudo mysql -e "CREATE DATABASE roundcube CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+sudo mysql -e "CREATE USER 'rcuser'@'localhost' IDENTIFIED BY 'Strong_DB_Pass';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON roundcube.* TO 'rcuser'@'localhost'; FLUSH PRIVILEGES;"</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">3</span> Download & Deploy Roundcube</h3>
+          <div class="command">
+            <pre><code>cd /var/www
+sudo wget -O roundcube.zip https://github.com/roundcube/roundcubemail/releases/download/1.6.7/roundcubemail-1.6.7-complete.tar.gz
+sudo tar -xzf roundcube.zip
+sudo mv roundcubemail-1.6.7 roundcube
+sudo chown -R www-data:www-data /var/www/roundcube
+sudo find /var/www/roundcube -type d -exec chmod 755 {} \;
+sudo find /var/www/roundcube -type f -exec chmod 644 {} \;</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>Version:</strong> প্রয়োজনে সর্বশেষ ভার্সনের URL ব্যবহার করুন।</div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">4</span> Apache vhost (webmail.example.com)</h3>
+          <div class="command">
+            <pre><code>sudo tee /etc/apache2/sites-available/roundcube.conf &gt;/dev/null &lt;&lt;'APACHE'
+&lt;VirtualHost *:80&gt;
+    ServerName webmail.example.com
+    DocumentRoot /var/www/roundcube
+    &lt;Directory /var/www/roundcube&gt;
+        AllowOverride All
+        Require all granted
+    &lt;/Directory&gt;
+    ErrorLog ${APACHE_LOG_DIR}/roundcube_error.log
+    CustomLog ${APACHE_LOG_DIR}/roundcube_access.log combined
+&lt;/VirtualHost&gt;
+APACHE
+sudo a2ensite roundcube.conf
+sudo a2enmod rewrite
+sudo systemctl reload apache2</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>DNS:</strong> <code>webmail.example.com</code> → A record to server IP। এরপর Let’s Encrypt SSL দিন।</div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">5</span> Roundcube Initial Config</h3>
+          <div class="command">
+            <pre><code>cp /var/www/roundcube/config/config.inc.php.sample /var/www/roundcube/config/config.inc.php
+sudo nano /var/www/roundcube/config/config.inc.php</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <p>Key options (sample):</p>
+          <div class="command">
+            <pre><code>$config['db_dsnw'] = 'mysql://rcuser:Strong_DB_Pass@localhost/roundcube';
+$config['default_host'] = 'ssl://mail.example.com';
+$config['default_port'] = 993;
+$config['smtp_server'] = 'tls://mail.example.com';
+$config['smtp_port'] = 587;
+$config['smtp_user'] = '%u';
+$config['smtp_pass'] = '%p';
+$config['product_name'] = 'Example Webmail';</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>Test:</strong> ব্রাউজারে <code>http://webmail.example.com/</code> খুলে login করুন (ইউজার: <code>user@example.com</code>)। SSL এর পর <code>https</code> ব্যবহার করুন।</div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">6</span> Enable HTTPS (Let’s Encrypt)</h3>
+          <div class="command">
+            <pre><code>sudo apt install -y certbot python3-certbot-apache
+sudo certbot --apache -d webmail.example.com
+# Auto-renew:
+sudo systemctl enable certbot.timer</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">7</span> Attach Roundcube under Virtualmin (optional)</h3>
+          <div class="command">
+            <pre><code># Option A: webmail subdomain as its own Virtual Server
+# Virtualmin → Create Virtual Server → Domain: webmail.example.com
+# তারপর Apache docroot কে /var/www/roundcube সেট করুন
+
+# Option B: main domain-এ /webmail path
+# Add alias in Apache vhost or symlink:
+sudo ln -s /var/www/roundcube /home/example/public_html/webmail
+sudo systemctl reload apache2</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+        </div>
+
+        <div class="step-section">
+          <h3><span class="step-number">8</span> Extras: Fail2ban, SpamAssassin, ClamAV</h3>
+          <div class="command">
+            <pre><code>sudo apt install -y fail2ban spamassassin clamav-daemon
+sudo systemctl enable --now fail2ban
+sudo systemctl enable --now spamassassin
+sudo freshclam &amp;&amp; sudo systemctl enable --now clamav-daemon</code></pre>
+            <button class="command-copy">Copy</button>
+          </div>
+          <div class="note"><strong>Security:</strong> Virtualmin → Fail2ban jail profiles, Postfix rate-limit, SMTP auth only, open relay off নিশ্চিত করুন।</div>
+        </div>
+      </section>
+
+      <div class="tutorial-nav">
+        <a href="xstream-server.html"><i class="fas fa-arrow-left"></i> Previous: XStream Server</a>
+        <a href="radarr-sonarr-bazarr.html">Next: Radarr, Sonarr, Bazarr <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </main>
+  </div>
+
+  <div class="success-message" id="copy-success">
+    <i class="fas fa-check-circle"></i> Command copied to clipboard!
+  </div>
+
+  <footer>
+    <p>&copy; 2025 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const el = document.getElementById(tab.dataset.tab + '-content');
+        if (el) el.classList.add('active');
+      });
+    });
+    // copy buttons
+    document.querySelectorAll('.command-copy').forEach(button => {
+      button.addEventListener('click', function() {
+        const code = this.previousElementSibling.textContent;
+        navigator.clipboard.writeText(code).then(() => {
+          const successMsg = document.getElementById('copy-success');
+          successMsg.style.display = 'block';
+          setTimeout(() => { successMsg.style.display = 'none'; }, 2000);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

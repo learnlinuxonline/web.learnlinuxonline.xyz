@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NTP Time Synchronization - LearnLinuxOnline</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --light: #ffffff;
+            --light-gray: #f8fafc;
+            --medium-gray: #e2e8f0;
+            --dark-gray: #64748b;
+            --text: #334155;
+            --text-dark: #1e293b;
+            --border: #cbd5e1;
+            --accent: #f59e0b;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--light-gray);
+        }
+        
+        header {
+            background: var(--light);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        nav {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: color 0.3s;
+            font-size: 1.1rem;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        nav a.active {
+            color: var(--primary);
+        }
+        
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .breadcrumb {
+            max-width: 1200px;
+            margin: 1rem auto 0;
+            padding: 0 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .project-content {
+            max-width: 1200px;
+            margin: 1rem auto 2rem;
+            padding: 0 1.5rem;
+        }
+        
+        .project-details {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .project-details h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+        
+        .project-details p {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .prerequisites {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .prerequisites h3 {
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .prerequisites ul {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+            list-style-type: none;
+        }
+        
+        .prerequisites li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .prerequisites li:before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .step-section {
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .step-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-section h3 .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+        }
+        
+        pre {
+            background: var(--light-gray);
+            padding: 1.2rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1.2rem 0;
+            border: 1px solid var(--medium-gray);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        code {
+            color: var(--secondary);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.95rem;
+        }
+        
+        .note {
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .note strong {
+            color: var(--accent);
+        }
+        
+        .warning {
+            background: #fef2f2;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .warning strong {
+            color: #ef4444;
+        }
+        
+        .info {
+            background: #eff6ff;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .info strong {
+            color: var(--primary);
+        }
+        
+        footer {
+            background: var(--light);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid var(--medium-gray);
+            color: var(--dark-gray);
+        }
+        
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+            
+            nav {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .project-content {
+                padding: 0 1rem;
+            }
+            
+            .project-details {
+                padding: 1.2rem;
+            }
+            
+            .project-details h2 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .command {
+            position: relative;
+        }
+        
+        .command-copy {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.3s;
+        }
+        
+        .command-copy:hover {
+            background: var(--primary);
+        }
+        
+        .success-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+        }
+        
+        .tutorial-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--medium-gray);
+        }
+        
+        .tutorial-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tutorial-nav a:hover {
+            text-decoration: underline;
+        }
+        
+        .config-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        
+        .config-table th, .config-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        .config-table th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+        }
+        
+        .config-table tr:nth-child(even) {
+            background-color: var(--light-gray);
+        }
+        
+        .tab-container {
+            margin: 1.5rem 0;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .feature-card {
+            background: var(--light-gray);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .feature-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">LearnLinuxOnline</div>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="courses.html">Courses</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <div class="breadcrumb">
+        <a href="index.html">Home</a> &raquo; NTP Time Synchronization
+    </div>
+
+    <div class="project-content">
+        <main class="project-details">
+            <h2>Time Synchronization with NTP on Ubuntu Server</h2>
+            <p>NTP (Network Time Protocol) is a networking protocol for clock synchronization between computer systems over packet-switched, variable-latency data networks. Accurate timekeeping is crucial for many server operations including logging, authentication, and task scheduling.</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4><i class="fas fa-clock"></i> Time Synchronization</h4>
+                    <p>NTP ensures all systems on your network maintain consistent and accurate time, which is critical for distributed systems and logging.</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-server"></i> Server or Client</h4>
+                    <p>Configure your server as an NTP client to sync with external time sources, or as an NTP server to provide time for your internal network.</p>
+                </div>
+                <div class="feature-card">
+                    <h4><i class="fas fa-shield-alt"></i> Security</h4>
+                    <p>Implement security features like access control and authentication to protect your time synchronization infrastructure.</p>
+                </div>
+            </div>
+            
+            <div class="prerequisites">
+                <h3><i class="fas fa-clipboard-list"></i> Prerequisites</h3>
+                <ul>
+                    <li>Ubuntu Server (any supported version)</li>
+                    <li>Root or sudo privileges</li>
+                    <li>Network connectivity to NTP servers</li>
+                    <li>Basic knowledge of Linux command line</li>
+                </ul>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">1</span> Check Current Time Configuration</h3>
+                <p>Check the current time and timezone settings:</p>
+                <div class="command">
+                    <pre><code>date
+timedatectl</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check if NTP is already active:</p>
+                <div class="command">
+                    <pre><code>timedatectl show | grep NTPSynchronized</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">2</span> Install NTP Package</h3>
+                <p>Update your package list and install the NTP package:</p>
+                <div class="command">
+                    <pre><code>sudo apt update
+sudo apt install -y ntp</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the installation:</p>
+                <div class="command">
+                    <pre><code>ntpd --version</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">3</span> Configure NTP Client</h3>
+                <p>Back up the original configuration file:</p>
+                <div class="command">
+                    <pre><code>sudo cp /etc/ntp.conf /etc/ntp.conf.backup</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Edit the NTP configuration:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/ntp.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure NTP pools (add these lines to the file):</p>
+                <div class="command">
+                    <pre><code># Use Ubuntu's NTP pool
+pool 0.ubuntu.pool.ntp.org iburst
+pool 1.ubuntu.pool.ntp.org iburst
+pool 2.ubuntu.pool.ntp.org iburst
+pool 3.ubuntu.pool.ntp.org iburst
+
+# Use fallback servers
+pool ntp.ubuntu.com
+
+# Restrict access
+restrict -4 default kod notrap nomodify nopeer noquery limited
+restrict -6 default kod notrap nomodify nopeer noquery limited
+
+# Allow localhost
+restrict 127.0.0.1
+restrict ::1
+
+# Allow network clients (replace with your network)
+restrict 192.168.1.0 mask 255.255.255.0 nomodify notrap</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">4</span> Start and Enable NTP Service</h3>
+                <p>Start the NTP service:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl start ntp</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Enable NTP to start on boot:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl enable ntp</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check the status of the NTP service:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status ntp</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">5</span> Configure Firewall for NTP</h3>
+                <p>Allow NTP traffic through the firewall:</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow ntp
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Alternatively, open the specific NTP port (UDP 123):</p>
+                <div class="command">
+                    <pre><code>sudo ufw allow 123/udp
+sudo ufw enable</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Verify the firewall status:</p>
+                <div class="command">
+                    <pre><code>sudo ufw status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">6</span> Verify NTP Synchronization</h3>
+                <p>Check NTP synchronization status:</p>
+                <div class="command">
+                    <pre><code>ntpq -p</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check NTP statistics:</p>
+                <div class="command">
+                    <pre><code>ntpstat</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check systemd-timesyncd status (if using timesyncd):</p>
+                <div class="command">
+                    <pre><code>timedatectl timesync-status
+timedatectl show-timesync</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">7</span> Configure NTP Server for Internal Network</h3>
+                <p>Edit the NTP configuration to serve time to your internal network:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/ntp.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Add these lines (replace with your network details):</p>
+                <div class="command">
+                    <pre><code># Serve time to internal network
+broadcast 192.168.1.255
+
+# Allow time queries from internal network
+restrict 192.168.1.0 mask 255.255.255.0 nomodify notrap
+
+# Local clock as fallback
+server 127.127.1.0
+fudge 127.127.1.0 stratum 10</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Restart NTP to apply changes:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart ntp</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">8</span> Configure systemd-timesyncd (Alternative)</h3>
+                <p>If you prefer using systemd's built-in time synchronization:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y systemd-timesyncd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Enable and start the service:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl enable systemd-timesyncd
+sudo systemctl start systemd-timesyncd</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check the status:</p>
+                <div class="command">
+                    <pre><code>timedatectl status</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure timesyncd:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/systemd/timesyncd.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Update the configuration:</p>
+                <div class="command">
+                    <pre><code>[Time]
+NTP=0.ubuntu.pool.ntp.org 1.ubuntu.pool.ntp.org 2.ubuntu.pool.ntp.org 3.ubuntu.pool.ntp.org
+FallbackNTP=ntp.ubuntu.com
+RootDistanceMaxSec=5
+PollIntervalMinSec=32
+PollIntervalMaxSec=2048</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">9</span> Configure Chrony (Alternative NTP Implementation)</h3>
+                <p>Install Chrony:</p>
+                <div class="command">
+                    <pre><code>sudo apt install -y chrony</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Edit the Chrony configuration:</p>
+                <div class="command">
+                    <pre><code>sudo nano /etc/chrony/chrony.conf</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Configure Chrony with appropriate servers:</p>
+                <div class="command">
+                    <pre><code>pool 0.ubuntu.pool.ntp.org iburst
+pool 1.ubuntu.pool.ntp.org iburst
+pool 2.ubuntu.pool.ntp.org iburst
+pool 3.ubuntu.pool.ntp.org iburst
+
+# Allow NTP client access from internal network
+allow 192.168.1.0/24
+
+# Serve time even if not synchronized to a time source
+local stratum 10</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Restart Chrony:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl restart chrony</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check Chrony tracking:</p>
+                <div class="command">
+                    <pre><code>chronyc tracking
+chronyc sources</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+            </div>
+            
+            <div class="step-section">
+                <h3><span class="step-number">10</span> Troubleshooting Common Issues</h3>
+                <p>Check NTP service status:</p>
+                <div class="command">
+                    <pre><code>sudo systemctl status ntp
+sudo journalctl -u ntp -f</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check NTP peer connections:</p>
+                <div class="command">
+                    <pre><code>ntpq -pn</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Force immediate time synchronization:</p>
+                <div class="command">
+                    <pre><code>sudo ntpdate -s pool.ntp.org</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Check detailed NTP information:</p>
+                <div class="command">
+                    <pre><code>ntptime
+ntpdc -c loopinfo</code></pre>
+                    <button class="command-copy">Copy</button>
+                </div>
+                <p>Common issues and solutions:</p>
+                <table class="config-table">
+                    <tr>
+                        <th>Issue</th>
+                        <th>Solution</th>
+                    </tr>
+                    <tr>
+                        <td>No synchronization</td>
+                        <td>Check firewall settings and NTP server connectivity</td>
+                    </tr>
+                    <tr>
+                        <td>Large time offset</td>
+                        <td>Force time sync with <code>sudo ntpdate -s pool.ntp.org</code></td>
+                    </tr>
+                    <tr>
+                        <td>Service won't start</td>
+                        <td>Check configuration syntax with <code>ntpd -q</code></td>
+                    </tr>
+                    <tr>
+                        <td>No peers available</td>
+                        <td>Verify network connectivity to NTP servers</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="tutorial-nav">
+                <a href="ldap-server.html"><i class="fas fa-arrow-left"></i> Previous: LDAP Server</a>
+                <a href="dns-server.html">Next: DNS Server <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </main>
+    </div>
+
+    <div class="success-message" id="copy-success">
+        <i class="fas fa-check-circle"></i> Command copied to clipboard!
+    </div>
+
+    <footer>
+        <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Copy to clipboard functionality
+        document.querySelectorAll('.command-copy').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.previousElementSibling.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const successMsg = document.getElementById('copy-success');
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        successMsg.style.display = 'none';
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

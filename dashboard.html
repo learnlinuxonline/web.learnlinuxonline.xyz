@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Dashboard - LearnLinuxOnline</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #059669;
+      --light: #ffffff;
+      --light-gray: #f8fafc;
+      --medium-gray: #e2e8f0;
+      --dark-gray: #64748b;
+      --text: #334155;
+      --text-dark: #1e293b;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text); background: var(--light-gray); }
+    header { background: var(--light); padding: 0.8rem 1.2rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 50; }
+    .brand { display: flex; align-items: center; gap: 0.6rem; color: var(--primary); font-weight: 800; font-size: 1.2rem; }
+    .top-actions { display: flex; gap: 0.5rem; align-items: center; }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.9rem; border-radius: 10px; border: 1px solid var(--medium-gray); background: var(--light); color: var(--text-dark); text-decoration: none; font-weight: 600; transition: 0.25s ease; }
+    .btn:hover { background: var(--light-gray); }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-primary:hover { background: var(--primary-light); }
+
+    .layout { display: grid; grid-template-columns: 240px 1fr; gap: 1.2rem; max-width: 1400px; margin: 1.2rem auto; padding: 0 1rem 1.2rem; }
+
+    /* Sidebar */
+    .sidebar { background: var(--light); border-radius: 14px; box-shadow: 0 10px 25px rgba(2,6,23,0.06); padding: 1rem; position: sticky; top: 70px; height: calc(100vh - 100px); overflow: auto; }
+    .sidebar h3 { color: var(--text-dark); margin: 0 0 0.8rem; font-size: 1rem; padding-left: 0.5rem; }
+    .menu { list-style: none; padding: 0; margin: 0; }
+    .menu li { margin-bottom: 0.25rem; }
+    .menu a { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.75rem; border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 500; }
+    .menu a:hover { background: var(--light-gray); }
+    .menu a.active { background: #eef2ff; color: var(--primary); font-weight: 700; }
+
+    /* Content */
+    .content { display: grid; gap: 1.2rem; }
+
+    /* Welcome card */
+    .card { background: var(--light); border-radius: 14px; box-shadow: 0 10px 25px rgba(2,6,23,0.06); padding: 1rem; }
+    .welcome { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .welcome h2 { margin: 0; color: var(--text-dark); font-size: 1.4rem; }
+    .subtitle { color: var(--dark-gray); margin-top: 0.2rem; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    .stat { padding: 1rem; border-radius: 12px; background: var(--light); border: 1px solid var(--medium-gray); display: grid; grid-template-columns: auto 1fr; gap: 0.8rem; align-items: center; }
+    .stat i { font-size: 1.4rem; color: var(--primary); }
+    .stat .value { font-size: 1.2rem; font-weight: 800; color: var(--text-dark); }
+    .stat .label { color: var(--dark-gray); font-size: 0.85rem; }
+
+    /* Grid columns */
+    .grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1rem; }
+
+    /* Courses */
+    .course-list { display: grid; gap: 0.8rem; }
+    .course-item { border: 1px solid var(--medium-gray); border-radius: 12px; padding: 0.9rem; display: grid; grid-template-columns: 1fr auto; gap: 0.8rem; align-items: center; }
+    .course-title { font-weight: 700; color: var(--text-dark); display:flex; align-items:center; gap:0.5rem; }
+    .progress { height: 10px; background: var(--light-gray); border-radius: 999px; overflow: hidden; border: 1px solid var(--medium-gray); }
+    .progress > span { display:block; height:100%; width:60%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+    .pill { background:#eef2ff; color: var(--primary); padding: 0.2rem 0.6rem; font-size: 0.8rem; border-radius: 999px; border: 1px solid var(--primary-light); }
+
+    /* Resources */
+    .resource-list { display: grid; gap: 0.6rem; }
+    .resource-item { display:flex; align-items:center; justify-content: space-between; gap: 0.6rem; border: 1px solid var(--medium-gray); border-radius: 12px; padding: 0.8rem; }
+    .resource-item a { text-decoration: none; color: var(--primary); font-weight: 600; }
+
+    /* Table */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.75rem; border-bottom: 1px solid var(--medium-gray); text-align: left; }
+    th { color: var(--text-dark); background: #f1f5ff; position: sticky; top: 0; }
+
+    /* Footer */
+    footer { background: var(--light); text-align: center; padding: 1rem; border-top: 1px solid var(--medium-gray); color: var(--dark-gray); }
+
+    /* Responsive */
+    @media (max-width: 1100px){ .stats { grid-template-columns: repeat(2,1fr);} .grid{ grid-template-columns: 1fr; } .layout{ grid-template-columns: 1fr; } .sidebar{ position: static; height: auto; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><i class="fa-solid fa-graduation-cap"></i> LearnLinuxOnline</div>
+    <div class="top-actions">
+      <a class="btn" href="courses.html"><i class="fa-solid fa-books"></i> Courses</a>
+      <a class="btn" href="contact.html"><i class="fa-solid fa-headset"></i> Support</a>
+      <a class="btn btn-primary" href="logout.html"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <h3>Navigation</h3>
+      <ul class="menu">
+        <li><a class="active" href="#home"><i class="fa-solid fa-house"></i> Dashboard</a></li>
+        <li><a href="#courses"><i class="fa-solid fa-book"></i> My Courses</a></li>
+        <li><a href="#downloads"><i class="fa-solid fa-download"></i> Downloads</a></li>
+        <li><a href="#certs"><i class="fa-solid fa-certificate"></i> Certificates</a></li>
+        <li><a href="#profile"><i class="fa-solid fa-user"></i> Profile</a></li>
+        <li><a href="#support"><i class="fa-solid fa-life-ring"></i> Support</a></li>
+      </ul>
+    </aside>
+
+    <main class="content">
+      <section class="card welcome" id="home">
+        <div>
+          <h2>Welcome back, <span style="color:var(--primary)">Student</span> 👋</h2>
+          <p class="subtitle">Here’s a quick snapshot of your learning progress and resources.</p>
+        </div>
+        <div class="btns">
+          <a href="#courses" class="btn btn-primary"><i class="fa-solid fa-arrow-right"></i> Continue Learning</a>
+        </div>
+      </section>
+
+      <section class="stats">
+        <div class="stat"><i class="fa-solid fa-book-open"></i><div><div class="value">3</div><div class="label">Active Courses</div></div></div>
+        <div class="stat"><i class="fa-solid fa-clock"></i><div><div class="value">12h</div><div class="label">Time Spent</div></div></div>
+        <div class="stat"><i class="fa-solid fa-check-circle"></i><div><div class="value">42%</div><div class="label">Avg. Progress</div></div></div>
+        <div class="stat"><i class="fa-solid fa-certificate"></i><div><div class="value">1</div><div class="label">Certificates</div></div></div>
+      </section>
+
+      <section class="grid" id="courses">
+        <div class="card">
+          <h3 style="margin:0 0 0.6rem;color:var(--text-dark)"><i class="fa-solid fa-layer-group"></i> Enrolled Courses</h3>
+          <div class="course-list">
+            <div class="course-item">
+              <div>
+                <div class="course-title"><i class="fa-solid fa-server"></i> Web, DNS & Mail Server</div>
+                <div class="progress" title="60%"><span style="width:60%"></span></div>
+              </div>
+              <span class="pill">60%</span>
+            </div>
+            <div class="course-item">
+              <div>
+                <div class="course-title"><i class="fa-solid fa-network-wired"></i> Network Monitoring</div>
+                <div class="progress" title="35%"><span style="width:35%"></span></div>
+              </div>
+              <span class="pill">35%</span>
+            </div>
+            <div class="course-item">
+              <div>
+                <div class="course-title"><i class="fa-solid fa-film"></i> Automation & Streaming</div>
+                <div class="progress" title="90%"><span style="width:90%"></span></div>
+              </div>
+              <span class="pill" style="background:#ecfdf5;color:var(--secondary);border-color:#bbf7d0">90%</span>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="downloads">
+          <h3 style="margin:0 0 0.6rem;color:var(--text-dark)"><i class="fa-solid fa-toolbox"></i> Quick Resources</h3>
+          <div class="resource-list">
+            <div class="resource-item">
+              <span><i class="fa-solid fa-file-lines"></i> Apache/Nginx Config Templates</span>
+              <a href="#">Download</a>
+            </div>
+            <div class="resource-item">
+              <span><i class="fa-solid fa-file-zipper"></i> Zimbra Mail Scripts</span>
+              <a href="#">Download</a>
+            </div>
+            <div class="resource-item">
+              <span><i class="fa-solid fa-file-code"></i> Monitoring Toolkits</span>
+              <a href="#">Download</a>
+            </div>
+            <div class="resource-item">
+              <span><i class="fa-solid fa-book"></i> Course Docs (PDF)</span>
+              <a href="#">Download</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="certs">
+        <h3 style="margin:0 0 0.6rem;color:var(--text-dark)"><i class="fa-solid fa-award"></i> Certificates</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Issued</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Web, DNS & Mail Server</td>
+              <td>Aug 20, 2025</td>
+              <td><span class="pill">Ready</span></td>
+              <td><a class="btn btn-primary" href="#"><i class="fa-solid fa-download"></i> Download</a></td>
+            </tr>
+            <tr>
+              <td>Network Monitoring</td>
+              <td>—</td>
+              <td><span class="pill" style="background:#fff7ed;color:#c2410c;border-color:#fed7aa">In Progress</span></td>
+              <td><a class="btn" href="#"><i class="fa-solid fa-eye"></i> View</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" id="support">
+        <h3 style="margin:0 0 0.6rem;color:var(--text-dark)"><i class="fa-solid fa-bullhorn"></i> Announcements</h3>
+        <ul style="margin:0; padding-left:1rem">
+          <li>🎉 New batch for <strong>Automation & Streaming</strong> starts Sept 5.</li>
+          <li>🛠 Maintenance window: Sundays 1–2 AM (UTC+6).</li>
+          <li>📢 Join our Telegram/WhatsApp for quick support.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>&copy; 2023 LearnLinuxOnline. All rights reserved.</p>
+  </footer>
+</body>
+</html>
